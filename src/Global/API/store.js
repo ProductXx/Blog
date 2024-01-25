@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getOwnerBlogRoute } from "./apiRoute";
+import { getOwnerBlogRoute, getUserDetailRoute } from "./apiRoute";
 
 const store = (set) => ({
   userInfo: null,
@@ -20,7 +20,25 @@ const store = (set) => ({
       console.log(error);
     }
   },
-
+  fetchUserDetail: async (id, token) => {
+    if (token) {
+      await axios
+        .post(
+          getUserDetailRoute,
+          { userId: id },
+          {
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          set(() => ({ userInfo: res?.data?.data }));
+        })
+        .catch((err) => console.log(err));
+    }
+  },
 });
 
 export const userStore = create(persist(store, { name: "blog" }));

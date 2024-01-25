@@ -4,7 +4,7 @@ import { userStore } from "../Global/API/store";
 import { adventurer } from "@dicebear/collection";
 import { useNavigate } from "react-router-dom";
 
-const Avatar = ({ name, id, size }) => {
+const Avatar = ({ name, id, size, stack }) => {
   const user = userStore((store) => store.userInfo);
   const nav = useNavigate();
   const seed = name || user.email;
@@ -19,9 +19,11 @@ const Avatar = ({ name, id, size }) => {
     <div
       onClick={(e) => {
         e.stopPropagation();
-        nav(`/profile/${id}`);
+        if (id) nav(`/profile/${id}`);
       }}
-      className="flex items-center space-x-2 cursor-pointer"
+      className={`flex items-center space-x-2 cursor-pointer ${
+        stack ? "-mr-10" : ""
+      }`}
     >
       <div
         className={`${
@@ -37,10 +39,6 @@ const Avatar = ({ name, id, size }) => {
           dangerouslySetInnerHTML={{ __html: svg }}
         />
       </div>
-      {/* Username */}
-      {/* {name === undefined ? null : (
-        <p className="text-primary font-semibold">{name}</p>
-      )} */}
     </div>
   );
 };

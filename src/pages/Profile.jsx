@@ -5,6 +5,7 @@ import Card from "../utils/Card";
 import Avatar from "../utils/Avatar";
 import {
   deleteUserRoute,
+  followUserRoute,
   getUserDetailRoute,
   getUsersRoute,
 } from "../Global/API/apiRoute";
@@ -13,6 +14,7 @@ import axios from "axios";
 import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ProfileCards from "../utils/ProfileCards";
 
 const Profile = () => {
   const { id } = useParams();
@@ -20,8 +22,11 @@ const Profile = () => {
   const fetchProfile = userStore((store) => store.fetchProfile);
   const addUser = userStore((store) => store.addUser);
   const profile = userStore((store) => store.profile);
+  const userInfo = userStore((store) => store.userInfo);
+  const userDetail = userStore((store) => store.fetchUserDetail);
   const token = Cookies.get("token");
   const [users, setUsers] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
   const allUsers = async () => {
     await axios
@@ -37,6 +42,39 @@ const Profile = () => {
     return users?.filter((user) =>
       profile?.followers?.find((el) => user._id === el)
     );
+  };
+
+  const showFollowing = () => {
+    return users?.filter((user) =>
+      profile?.following?.find((el) => user._id === el)
+    );
+  };
+
+  // Follow user --> need blog user id, token
+  const handleFollow = async (e) => {
+    e.stopPropagation();
+    if (token) {
+      await axios
+        .post(
+          followUserRoute,
+          { userId: profile._id },
+          {
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          // console.log(res);
+          userDetail(userInfo._id, token);
+          setRefresh(!refresh);
+        })
+        .catch((err) => console.log(err));
+      return;
+    }
+    toast.error("You need to login!", { autoClose: 2000 });
+    setTimeout(() => nav("/login"), 3000);
   };
 
   // Only owner can delete --> need user id
@@ -61,11 +99,11 @@ const Profile = () => {
   useEffect(() => {
     fetchProfile(id);
     allUsers();
-  }, [id]);
+  }, [id, refresh]);
 
   return (
     <div className="flex flex-col items-start gap-5 px-3">
-      <div className="flex justify-between w-full">
+      <div className="flex justify-between items-start w-full">
         <div className="space-y-3">
           <Avatar name={profile?.email} size={"lg"} />
           <div className="space-y-2">
@@ -75,13 +113,26 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        <div className="flex gap-2 mt-5">
-          <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
-          <BiSolidTrashAlt
-            onClick={handleDelete}
-            className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
-          />
-        </div>
+        {profile?._id === userInfo?._id ? (
+          <div className="flex gap-2 mt-5">
+            <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
+            <BiSolidTrashAlt
+              onClick={handleDelete}
+              className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
+            />
+          </div>
+        ) : (
+          <div
+            onClick={handleFollow}
+            className="py-1 px-4 bg-lightWhite rounded mt-5"
+          >
+            <span>
+              {userInfo?.following?.includes(profile?._id)
+                ? "Following"
+                : "Follow +"}
+            </span>
+          </div>
+        )}
       </div>
       <div className="self-center w-full h-[1px] bg-gradient-to-r from-transparent via-lightWhite to-transparent"></div>
 
@@ -97,19 +148,57 @@ const Profile = () => {
           <span className="font-semibold">Followers</span>
         </div>
         <div>
-          <h1 className="font-bold text-2xl">{profile?.following?.length}</h1>
+          <h1 className="font-bold text-2xl">
+            {profile?.following ? profile?.following?.length : 0}
+          </h1>
           <span className="font-semibold">Following</span>
         </div>
       </div>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Friends</h1>
-        <div className="flex gap-3">
-          {showFollowers().map((follower) => (
-            <div key={follower?._id} className="flex flex-col gap-1">
-              <Avatar name={follower?.email} id={follower?._id} />
-              <span className="text-sm">{follower?.name}</span>
-            </div>
-          ))}
+      <div className="w-full grid grid-cols-2">
+        <div className="space-y-2 ">
+          <h1 className="text-2xl font-semibold">Followers</h1>
+          <div className="flex gap-3 w-40 overflow-hidden">
+            {showFollowers().map((follower) => (
+              <div key={follower?._id} className="flex flex-col gap-1">
+                <Avatar
+                  name={follower?.email}
+                  id={follower?._id}
+                  stack={true}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold">Following</h1>
+          <div className="flex gap-3 w-40 overflow-hidden">
+            {showFollowing().map((following) => (
+              <div key={following?._id} className="flex flex-col gap-1">
+                <Avatar
+                  name={following?.email}
+                  id={following?._id}
+                  stack={true}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="space-y-3">
+        <h1 className="text-3xl font-bold">Blogs</h1>
+        <div className="grid grid-cols-12 space-y-10 mb-20 w-full max-w-[400px] mx-auto">
+          {profile?.blogs?.map((blog) => {
+            return (
+              <ProfileCards
+                key={blog._id}
+                blog={blog}
+                email={profile.email}
+                name={profile.name}
+                refresh={refresh}
+                setRefresh={setRefresh}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
