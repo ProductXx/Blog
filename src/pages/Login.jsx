@@ -37,7 +37,6 @@ const Login = () => {
       await axios
         .post(loginRoute, formData)
         .then((res) => {
-          console.log(res?.data);
           addUser(res?.data?.data)
           Cookies.set("token", res?.data?.token);
           nav("/");

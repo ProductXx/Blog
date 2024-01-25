@@ -50,7 +50,7 @@ const CommentForm = ({ comments, blogId, refresh, setRefresh }) => {
   // Show Commented User
   const cmtUserName = (cmt) => {
     const user = users?.find((el) => el._id === cmt.userId);
-    return user?.name;
+    return user;
   };
 
   useEffect(() => {
@@ -71,8 +71,8 @@ const CommentForm = ({ comments, blogId, refresh, setRefresh }) => {
             return (
               <div key={i} className="flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <Avatar name={cmtUserName(cmt)} />
-                  <span className="font-semibold text-sm">{cmtUserName(cmt)}</span>
+                  <Avatar name={cmtUserName(cmt).email} />
+                  <span className="font-semibold text-sm">{cmtUserName(cmt).name}</span>
                 </div>
 
                 <span className="bg-[#fff] p-3 relative rounded-md after:w-5 after:h-5 after:bg-[#fff] after:absolute after:-top-2 after:left-3 after:rotate-45 after:rounded-sm">

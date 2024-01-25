@@ -1,16 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BiLogIn } from "react-icons/bi";
 import Avatar from "../utils/Avatar";
 import Cookies from "js-cookie";
 import { userStore } from "../Global/API/store";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 
 const Navbar = () => {
   const user = userStore((store) => store.userInfo);
-  // console.log(user)
   const token = Cookies.get("token");
+  const [hidden, setHidden] = useState(false);
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const prev = scrollY.getPrevious();
+    if (latest > prev && prev > 150) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+  });
   return (
-    <nav className=" text-primary px-2 py-3 fixed w-full z-50">
+    <motion.nav
+      variants={{
+        hidden: {
+          y: "-100%",
+        },
+        visible: {
+          y: 0,
+        },
+      }}
+      animate={hidden ? "hidden" : "visible"}
+      transition={{
+        duration: 0.5,
+      }}
+      className=" text-primary bg-white px-2 py-3 fixed w-full z-50"
+    >
       <div className="flex justify-between items-center">
         {/* LOGO HERE */}
         <Link to={"/"} className="font-bold text-3xl">
@@ -30,7 +55,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

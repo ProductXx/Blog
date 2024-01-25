@@ -20,6 +20,7 @@ const store = (set) => ({
       console.log(error);
     }
   },
+
 });
 
 export const userStore = create(persist(store, { name: "blog" }));

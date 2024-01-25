@@ -1,23 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import HashTag from "./HashTag";
 import Avatar from "./Avatar";
 import LikeBtn from "./LikeBtn";
 import CommentBtn from "./CommentBtn";
 import moment from "moment";
-import { SlLike } from "react-icons/sl";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { followUserRoute, likeBlogRoute } from "../Global/API/apiRoute";
+import {
+  deleteBlogRoute,
+  followUserRoute,
+  likeBlogRoute,
+} from "../Global/API/apiRoute";
 import { userStore } from "../Global/API/store";
+import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
 
 const Card = ({ refresh, setRefresh, blog }) => {
   const {
     _id,
     title,
     author_name,
-    blogOwner,
+    ownerInfo,
     hashTag,
     content,
     blogImg,
@@ -25,6 +29,8 @@ const Card = ({ refresh, setRefresh, blog }) => {
     like,
     comments,
   } = blog;
+
+  // console.log(ownerInfo)
 
   const userInfo = userStore((store) => store.userInfo);
   const addBlog = userStore((store) => store.addBlog);
@@ -73,13 +79,13 @@ const Card = ({ refresh, setRefresh, blog }) => {
   };
 
   // Follow user --> need blog user id, token
-  const handelFollow = async (e) => {
+  const handleFollow = async (e) => {
     e.stopPropagation();
     if (token) {
       await axios
         .post(
           followUserRoute,
-          { userId: blogOwner },
+          { userId: ownerInfo._id },
           {
             headers: {
               "Content-type": "application/json",
@@ -88,7 +94,24 @@ const Card = ({ refresh, setRefresh, blog }) => {
           }
         )
         .then((res) => {
-          console.log(res);
+          // console.log(res);
+          setRefresh(!refresh);
+        })
+        .catch((err) => console.log(err));
+      return;
+    }
+    toast.error("You need to login!", { autoClose: 2000 });
+    setTimeout(() => nav("/login"), 3000);
+  };
+
+  // Only owner can delete blog --> need blog id
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (token) {
+      await axios
+        .delete(deleteBlogRoute + `/${_id}`)
+        .then((res) => {
+          if (res?.status === 200) toast.success("Blog delete successfully.");
           setRefresh(!refresh);
         })
         .catch((err) => console.log(err));
@@ -101,17 +124,17 @@ const Card = ({ refresh, setRefresh, blog }) => {
   return (
     <div
       onClick={handleDetail}
-      className="col-span-12  md:col-span-6 lg:col-span-12"
+      className="col-span-12 md:col-span-6 lg:col-span-12"
     >
       <div className="flex flex-col gap-3 relative shadow rounded-md p-2 md:p-4">
         <div className="flex justify-between items-center gap-2">
           {/* User info and when u click direct to user profile */}
           <div className="flex space-x-3">
-            <Avatar name={author_name} id={blogOwner} />
+            <Avatar name={author_name} id={ownerInfo._id} />
             <div
               onClick={(e) => {
                 e.stopPropagation();
-                nav(`/profile/${blogOwner}`);
+                nav(`/profile/${ownerInfo._id}`);
               }}
               className="space-y-1"
             >
@@ -121,15 +144,22 @@ const Card = ({ refresh, setRefresh, blog }) => {
               <p className="text-sm text-lightGray">{moment(date).fromNow()}</p>
             </div>
           </div>
-
           {/* If userId and blog userId is same, can't follow yourself and not same it's ok */}
-          {userInfo?._id === blogOwner ? null : (
+          {userInfo?._id === ownerInfo._id ? (
+            <div className="flex gap-2">
+              <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
+              <BiSolidTrashAlt
+                onClick={handleDelete}
+                className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
+              />
+            </div>
+          ) : (
             <div
-              onClick={handelFollow}
+              onClick={handleFollow}
               className="py-1 px-4 bg-lightWhite rounded"
             >
               <span>
-                {userInfo?.following?.includes(blogOwner)
+                {userInfo?.following?.includes(ownerInfo._id)
                   ? "Following"
                   : "Follow +"}
               </span>

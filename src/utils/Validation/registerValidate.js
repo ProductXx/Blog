@@ -13,7 +13,6 @@ const registerValidate = (formData) => {
   } else if (formData.password !== formData.confirmPassword) {
     validationErrors.confirmPassword = "Password must be same.";
   }
-  console.log(validationErrors);
 
   return {validationErrors,valid:Object.keys(validationErrors).length < 1};
 };

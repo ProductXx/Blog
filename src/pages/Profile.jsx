@@ -3,13 +3,22 @@ import { useParams } from "react-router-dom";
 import { userStore } from "../Global/API/store";
 import Card from "../utils/Card";
 import Avatar from "../utils/Avatar";
-import { getUserDetailRoute, getUsersRoute } from "../Global/API/apiRoute";
+import {
+  deleteUserRoute,
+  getUserDetailRoute,
+  getUsersRoute,
+} from "../Global/API/apiRoute";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Profile = () => {
   const { id } = useParams();
+  const nav = useNavigate();
   const fetchProfile = userStore((store) => store.fetchProfile);
+  const addUser = userStore((store) => store.addUser);
   const profile = userStore((store) => store.profile);
   const token = Cookies.get("token");
   const [users, setUsers] = useState([]);
@@ -30,6 +39,25 @@ const Profile = () => {
     );
   };
 
+  // Only owner can delete --> need user id
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (token) {
+      await axios
+        .delete(deleteUserRoute + `/${profile._id}`)
+        .then((res) => {
+          if (res?.status === 200) toast.success("User delete successfully.");
+          Cookies.remove("token");
+          addUser(null);
+          nav("/");
+        })
+        .catch((err) => console.log(err));
+      return;
+    }
+    toast.error("You need to login!", { autoClose: 2000 });
+    setTimeout(() => nav("/login"), 3000);
+  };
+
   useEffect(() => {
     fetchProfile(id);
     allUsers();
@@ -37,13 +65,22 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col items-start gap-5 px-3">
-      <div className="space-y-3">
-        <Avatar name={profile?.email} size={"lg"} />
-        <div className="space-y-2">
-          <div>
-            <h1 className="font-bold text-2xl">{profile.name}</h1>
-            <p className="font-semibold">{profile.email}</p>
+      <div className="flex justify-between w-full">
+        <div className="space-y-3">
+          <Avatar name={profile?.email} size={"lg"} />
+          <div className="space-y-2">
+            <div>
+              <h1 className="font-bold text-2xl">{profile.name}</h1>
+              <p className="font-semibold">{profile.email}</p>
+            </div>
           </div>
+        </div>
+        <div className="flex gap-2 mt-5">
+          <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
+          <BiSolidTrashAlt
+            onClick={handleDelete}
+            className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
+          />
         </div>
       </div>
       <div className="self-center w-full h-[1px] bg-gradient-to-r from-transparent via-lightWhite to-transparent"></div>
@@ -68,7 +105,7 @@ const Profile = () => {
         <h1 className="text-2xl font-semibold">Friends</h1>
         <div className="flex gap-3">
           {showFollowers().map((follower) => (
-            <div className="flex flex-col gap-1">
+            <div key={follower?._id} className="flex flex-col gap-1">
               <Avatar name={follower?.email} id={follower?._id} />
               <span className="text-sm">{follower?.name}</span>
             </div>

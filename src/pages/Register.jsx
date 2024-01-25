@@ -14,16 +14,7 @@ const Register = () => {
     confirmPassword: "",
   };
   const [formData, setFormData] = useState(initialState);
-  const [existedUser, setExistedUser] = useState([]);
   const [errors, setErrors] = useState();
-
-  // fetch all users already existed
-  const fetchUsers = async () => {
-    await axios
-      .get(getAllBlogRoute)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-  };
 
   // Save values change in every input
   const handleChangeInput = (e) => {
@@ -59,10 +50,6 @@ const Register = () => {
         .catch((err) => toast.error(err?.response?.data?.message));
     }
   };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   return (
     <div className="flex items-center justify-center h-[100vh]">
