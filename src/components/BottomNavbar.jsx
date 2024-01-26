@@ -75,7 +75,7 @@ const BottomNavbar = () => {
       id: 3,
       variant: navMenu3,
       delay: 0.3,
-      link: "/",
+      link: "/users",
       icon: <BsPeopleFill />,
     },
   ];

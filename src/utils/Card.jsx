@@ -138,7 +138,7 @@ const Card = ({ refresh, setRefresh, blog }) => {
               className="space-y-1"
             >
               <span className="cursor-pointer hover:underline">
-                {author_name}
+                {ownerInfo.name}
               </span>
               <p className="text-sm text-lightGray">{moment(date).fromNow()}</p>
             </div>
@@ -146,7 +146,6 @@ const Card = ({ refresh, setRefresh, blog }) => {
           {/* If userId and blog userId is same, can't follow yourself and not same it's ok */}
           {userInfo?._id === ownerInfo._id ? (
             <div className="flex gap-2">
-              <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
               <BiSolidTrashAlt
                 onClick={handleDelete}
                 className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"

@@ -1,7 +1,7 @@
 import React from "react";
 import { createAvatar } from "@dicebear/core";
 import { userStore } from "../Global/API/store";
-import { adventurer } from "@dicebear/collection";
+import { adventurer, shapes, thumbs } from "@dicebear/collection";
 import { useNavigate } from "react-router-dom";
 
 const Avatar = ({ name, id, size, stack }) => {

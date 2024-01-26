@@ -115,7 +115,7 @@ const Profile = () => {
         </div>
         {profile?._id === userInfo?._id ? (
           <div className="flex gap-2 mt-5">
-            <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
+            <BiSolidPencil onClick={()=>nav('/EditUser')} className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
             <BiSolidTrashAlt
               onClick={handleDelete}
               className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
@@ -184,7 +184,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      <div className="space-y-3">
+      <div className="w-full space-y-3">
         <h1 className="text-3xl font-bold">Blogs</h1>
         <div className="grid grid-cols-12 space-y-10 mb-20 w-full max-w-[400px] mx-auto">
           {profile?.blogs?.map((blog) => {

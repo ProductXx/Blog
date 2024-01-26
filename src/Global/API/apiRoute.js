@@ -6,6 +6,7 @@ const getUsersRoute = `${API}/user`;
 const getUserDetailRoute = `${API}/user/account/detail`;
 const followUserRoute = `${API}/user/account/following`;
 const deleteUserRoute = `${API}/user/delete`;
+const editUserRoute = `${API}/user/edit`;
 const getAllBlogRoute = `${API}/blog`;
 const createBlogRoute = `${API}/blog/create`;
 const getSingleBlogRoute = `${API}/blog/single-blog`;
@@ -21,6 +22,7 @@ export {
   getUserDetailRoute,
   followUserRoute,
   deleteUserRoute,
+  editUserRoute,
   getAllBlogRoute,
   createBlogRoute,
   likeBlogRoute,

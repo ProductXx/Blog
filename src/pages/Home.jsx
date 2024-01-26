@@ -16,7 +16,11 @@ const Home = () => {
     await axios
       .get(`${import.meta.env.VITE_API}/blog`)
       .then((res) => {
-        setBlogs(res?.data?.data);
+        // Sort blogs in descending order based on created date
+        const sortedBlogs = res?.data?.data.sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+        setBlogs(sortedBlogs);
       })
       .catch((err) => console.log(err));
   };

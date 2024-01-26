@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { deleteBlogRoute, likeBlogRoute } from "../Global/API/apiRoute";
+import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
 
 const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
   const {
@@ -99,7 +100,7 @@ const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
             <Avatar name={email} />
             <div className="space-y-1">
               <span className="cursor-pointer hover:underline">
-                {author_name}
+                {userInfo.name}
               </span>
               <p className="text-sm text-lightGray">{moment(date).fromNow()}</p>
             </div>

@@ -6,6 +6,8 @@ import Register from '../pages/Register'
 import Detail from '../pages/Detail'
 import Profile from '../pages/Profile'
 import CreateBlog from '../pages/CreateBlog'
+import AllUsers from '../pages/AllUsers'
+import EditUser from '../pages/EditUser'
 
 const Path = () => {
   return (
@@ -16,6 +18,8 @@ const Path = () => {
         <Route path='/detail/:title' element={<Detail/>}/>
         <Route path='/profile/:id' element={<Profile/>}/>
         <Route path='/create' element={<CreateBlog/>}/>
+        <Route path='/users' element={<AllUsers/>}/>
+        <Route path='/editUser' element={<EditUser/>}/>
     </Routes>
   )
 }
