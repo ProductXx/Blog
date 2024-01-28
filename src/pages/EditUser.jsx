@@ -1,19 +1,24 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { userStore } from "../Global/API/store";
-import { editUserRoute } from "../Global/API/apiRoute";
+import { editUserRoute } from "../Global/API/userRoute";
 import { toast } from "react-toastify";
-import registerValidate from "../utils/Validation/registerValidate";
 import axios from "axios";
+import { useGetUserDetail } from "../Hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 const EditUser = () => {
-  const profile = userStore((store) => store.profile);
+  const queryClient = useQueryClient();
+  const userInfo = userStore((store) => store.userInfo);
   const nav = useNavigate();
+  const { mutateAsync } = useGetUserDetail(queryClient);
+
   const initialState = {
-    _id:profile._id,
-    name: profile.name,
-    email: profile.email,
+    _id: userInfo?._id,
+    name: userInfo?.name,
+    email: userInfo?.email,
   };
+
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState();
 
@@ -42,6 +47,8 @@ const EditUser = () => {
       .catch((err) => toast.error(err?.response?.data?.message));
   };
 
+
+  
   return (
     <div className="max-w-lg border border-lightWhite rounded p-5">
       <form onSubmit={handleSubmit} className="space-y-6">

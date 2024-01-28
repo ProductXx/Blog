@@ -1,26 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
+import axios from "axios";
+import moment from "moment";
+import Cookies from "js-cookie";
+import FollowBtn from "./FollowBtn";
 import HashTag from "./HashTag";
 import Avatar from "./Avatar";
 import LikeBtn from "./LikeBtn";
 import CommentBtn from "./CommentBtn";
-import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axios from "axios";
-import Cookies from "js-cookie";
-import {
-  deleteBlogRoute,
-  followUserRoute,
-  likeBlogRoute,
-} from "../Global/API/apiRoute";
+import { useNavigate } from "react-router-dom";
+import { BiSolidTrashAlt } from "react-icons/bi";
 import { userStore } from "../Global/API/store";
-import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
+import { deleteBlogRoute } from "../Global/API/blogRoute";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const Card = ({ refresh, setRefresh, blog }) => {
+const Card = ({ blog }) => {
   const {
     _id,
     title,
-    author_name,
     ownerInfo,
     hashTag,
     content,
@@ -30,11 +27,10 @@ const Card = ({ refresh, setRefresh, blog }) => {
     comments,
   } = blog;
 
-
+  const queryClient = useQueryClient();
   const userInfo = userStore((store) => store.userInfo);
   const addBlog = userStore((store) => store.addBlog);
   const nav = useNavigate();
-  const likeCount = like ? like.length : 0;
   const commentCount = comments ? comments.length : 0;
   const token = Cookies.get("token");
 
@@ -42,78 +38,28 @@ const Card = ({ refresh, setRefresh, blog }) => {
   const handleDetail = () => {
     if (token) {
       addBlog(blog);
-      nav(`/detail/${title}`);
+      nav(`/detail/${title}`, { state: { id: _id } });
     } else {
       toast.error("You need to login!", { autoClose: 2000 });
       setTimeout(() => nav("/login"), 3000);
     }
   };
 
-  // if login userId and likeUserId same like btn will change
-  const match = like?.find((el) => el === userInfo?._id);
-
-  // Like function
-  const handleLike = async () => {
-    if (token) {
-      await axios
-        .post(
-          likeBlogRoute,
-          { blogId: _id },
-          {
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          // console.log(res?.data);
-          setRefresh(!refresh);
-        })
-        .catch((err) => console.log(err));
-      return;
-    }
-    toast.error("You need to login!", { autoClose: 2000 });
-    setTimeout(() => nav("/login"), 3000);
-  };
-
-  // Follow user --> need blog user id, token
-  const handleFollow = async (e) => {
-    e.stopPropagation();
-    if (token) {
-      await axios
-        .post(
-          followUserRoute,
-          { userId: ownerInfo._id },
-          {
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          // console.log(res);
-          setRefresh(!refresh);
-        })
-        .catch((err) => console.log(err));
-      return;
-    }
-    toast.error("You need to login!", { autoClose: 2000 });
-    setTimeout(() => nav("/login"), 3000);
-  };
+  const { mutate } = useMutation({
+    mutationFn: () =>
+      axios.delete(`${import.meta.env.VITE_API}/blog/delete/${_id}`),
+    onSuccess: () => {
+      toast.success("Blog delete successful");
+      queryClient.invalidateQueries({ queryKey: ["Blogs"] });
+    },
+    onError: (err) => console.log(err),
+  });
 
   // Only owner can delete blog --> need blog id
   const handleDelete = async (e) => {
     e.stopPropagation();
     if (token) {
-      await axios
-        .delete(deleteBlogRoute + `/${_id}`)
-        .then((res) => {
-          if (res?.status === 200) toast.success("Blog delete successfully.");
-          setRefresh(!refresh);
-        })
-        .catch((err) => console.log(err));
+      mutate();
       return;
     }
     toast.error("You need to login!", { autoClose: 2000 });
@@ -148,20 +94,15 @@ const Card = ({ refresh, setRefresh, blog }) => {
             <div className="flex gap-2">
               <BiSolidTrashAlt
                 onClick={handleDelete}
+                // onClick={(e) => {
+                //   e.stopPropagation();
+                //   toast.error("Blog Delete is under maintenance !!");
+                // }}
                 className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
               />
             </div>
           ) : (
-            <div
-              onClick={handleFollow}
-              className="py-1 px-4 bg-lightWhite rounded"
-            >
-              <span>
-                {userInfo?.following?.includes(ownerInfo._id)
-                  ? "Following"
-                  : "Follow +"}
-              </span>
-            </div>
+            <FollowBtn userId={userInfo?._id} ownerInfo={ownerInfo} />
           )}
         </div>
         <div className="flex flex-col gap-2 p-2 mb-3">
@@ -174,11 +115,7 @@ const Card = ({ refresh, setRefresh, blog }) => {
         </div>
 
         <div className="absolute -bottom-5 left-[50%] -translate-x-[50%] flex gap-3  rounded-3xl backdrop-blur px-3 py-2 shadow">
-          <LikeBtn
-            handleLike={handleLike}
-            match={match}
-            likeCount={likeCount}
-          />
+          <LikeBtn blogId={_id} userId={userInfo?._id} like={like} />
           <div className="w-[1px] h-[25px] bg-lightGray/30"></div>
           <CommentBtn commentCount={commentCount} />
         </div>

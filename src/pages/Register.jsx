@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { getAllBlogRoute, getUsersRoute, registerRoute } from "../Global/API/apiRoute";
+import { registerRoute } from "../Global/API/userRoute";
 import registerValidate from "../utils/Validation/registerValidate";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";

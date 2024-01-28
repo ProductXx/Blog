@@ -4,27 +4,36 @@ import HashTag from "../utils/HashTag";
 import CommentForm from "../utils/CommentForm";
 import axios from "axios";
 import { userStore } from "../Global/API/store";
-import { getSingleBlogRoute, getUsersRoute } from "../Global/API/apiRoute";
+import { getSingleBlogRoute } from "../Global/API/blogRoute";
 import Cookies from "js-cookie";
+import { useLocation } from "react-router-dom";
+import { useGetSingleBlog } from "../Hooks/blog";
 
 const Detail = () => {
   const [blog, setBlog] = useState();
   const [refresh, setRefresh] = useState(false);
   const storeBlog = userStore((store) => store.blog);
   const { _id } = storeBlog;
+  const location = useLocation();
 
-  const getSingleBlog = async () => {
-    await axios
-      .post(getSingleBlogRoute, { _id })
-      .then((res) => {
-        setBlog(res?.data?.data[0]);
-      })
-      .catch((err) => console.log(err));
-  };
+  const { mutateAsync: getSingleBlog, data } = useGetSingleBlog();
 
+  // const getSingleBlog = async () => {
+  //   await axios
+  //     .post("http://localhost:8000/api/v1/blog/single-blog", { _id })
+  //     .then((res) => {
+  //       setBlog(res?.data?.data[0]);
+  //     })
+  //     .catch((err) => console.log(err));
+  // };
+
+  // useEffect(() => {
+  //   getSingleBlog();
+  // }, [_id, refresh]);
+  
   useEffect(() => {
-    getSingleBlog();
-  }, [_id, refresh]);
+    getSingleBlog({ _id }).then(res=>setBlog(res?.data?.data[0]));
+  }, []);
 
   return (
     <div>
@@ -42,8 +51,6 @@ const Detail = () => {
         <CommentForm
           comments={blog?.comments}
           blogId={blog?._id}
-          refresh={refresh}
-          setRefresh={setRefresh}
         />
       </div>
     </div>

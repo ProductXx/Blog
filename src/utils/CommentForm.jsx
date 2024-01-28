@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { commentBlogRoute, getUsersRoute } from "../Global/API/apiRoute";
-import axios from "axios";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
 import { IoIosSend } from "react-icons/io";
 import Avatar from "./Avatar";
+import { BiSolidTrashAlt } from "react-icons/bi";
+import { userStore } from "../Global/API/store";
+import { useCommentBlog, useDeleteCmt } from "../Hooks/blog";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetAllUsers } from "../Hooks/user";
 
-const CommentForm = ({ comments, blogId, refresh, setRefresh }) => {
+const CommentForm = ({ comments, blogId }) => {
   const [comment, setComment] = useState("");
-  const [users, setUsers] = useState();
-  const token = Cookies.get("token");
+  const userInfo = userStore((store) => store.userInfo);
+  const queryClient = useQueryClient();
+
+  const { data: users } = useGetAllUsers();
+  const { mutateAsync } = useCommentBlog(queryClient);
+  const { mutateAsync: deleteCmt } = useDeleteCmt(queryClient);
 
   // Post comment route need blogId and User Comment
   const postComment = async (e) => {
@@ -18,44 +24,16 @@ const CommentForm = ({ comments, blogId, refresh, setRefresh }) => {
       toast.error("Comment is not be empty!");
       return;
     } else {
-      await axios
-        .post(
-          commentBlogRoute,
-          { blogId, userComment: comment },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          setRefresh(!refresh);
-          setComment("");
-        })
-        .catch((err) => console.log(err));
+      mutateAsync({ blogId, userComment: comment });
+      setComment("");
     }
-  };
-
-  // Get comments in selected Blog
-  const commentUser = async () => {
-    await axios
-      .get(getUsersRoute, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => {
-        setUsers(res?.data?.data);
-      })
-      .catch((err) => console.log(err));
   };
 
   // Show Commented User
   const cmtUserName = (cmt) => {
-    const user = users?.find((el) => el._id === cmt.userId);
+    const user = users?.data?.data?.find((el) => el._id === cmt.userId);
     return user;
   };
-
-  useEffect(() => {
-    commentUser();
-  }, []);
 
   return (
     <>
@@ -70,9 +48,21 @@ const CommentForm = ({ comments, blogId, refresh, setRefresh }) => {
           {comments?.map((cmt, i) => {
             return (
               <div key={i} className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <Avatar name={cmtUserName(cmt).email} />
-                  <span className="font-semibold text-sm">{cmtUserName(cmt).name}</span>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Avatar name={cmtUserName(cmt)?.email} />
+                    <span className="font-semibold text-sm">
+                      {cmtUserName(cmt)?.name}
+                    </span>
+                  </div>
+                  {userInfo?._id === cmt?.userId ? (
+                    <div className="flex gap-2">
+                      <BiSolidTrashAlt
+                        onClick={() => deleteCmt({ commentId: cmt?._id })}
+                        className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
+                      />
+                    </div>
+                  ) : null}
                 </div>
 
                 <span className="bg-[#fff] p-3 relative rounded-md after:w-5 after:h-5 after:bg-[#fff] after:absolute after:-top-2 after:left-3 after:rotate-45 after:rounded-sm">
@@ -101,36 +91,6 @@ const CommentForm = ({ comments, blogId, refresh, setRefresh }) => {
           </form>
         </div>
       </div>
-      {/* <div className="flex flex-col gap-y-3 p-2 h-[350px] overflow-y-scroll rounded-md shadow">
-        {comments?.map((cmt, i) => {
-          return (
-            <div key={i} className="flex flex-col gap-2 border-b pb-3">
-              <div className="flex items-center gap-2">
-                <Avatar name={cmtUserName(cmt)}/>
-                <span>{cmtUserName(cmt)}</span>
-              </div>
-              <span className="pl-5">{cmt.userComment}</span>
-            </div>
-          );
-        })}
-      </div> */}
-      {/* <div className="flex rounded shadow overflow-hidden">
-        <input
-          type="text"
-          placeholder="Write a comment..."
-          className="p-3 outline-none w-full"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        />
-        <button
-          onClick={() => {
-            postComment();
-          }}
-          className="p-3 bg-primary text-secondary"
-        >
-          <IoIosSend className="text-xl" />
-        </button>
-      </div> */}
     </>
   );
 };

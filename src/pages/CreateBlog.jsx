@@ -1,16 +1,15 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { BiImageAdd } from "react-icons/bi";
-import { createBlogRoute } from "../Global/API/apiRoute";
-import Cookies from "js-cookie";
 import { userStore } from "../Global/API/store";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useCreateBlog } from "../Hooks/blog";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CreateBlog = () => {
   const userInfo = userStore((store) => store.userInfo);
   const [tags, setTags] = useState([]);
   const nav = useNavigate();
+  const queryClient = useQueryClient();
 
   const initialState = {
     title: "",
@@ -22,7 +21,6 @@ const CreateBlog = () => {
 
   const [formData, setFormData] = useState(initialState);
   const [selectedImage, setSelectedImage] = useState(null);
-  const token = Cookies.get("token");
 
   // Save values change in every input
   const handleChangeInput = (e) => {
@@ -32,20 +30,44 @@ const CreateBlog = () => {
 
   // Add Hash Tags
   const handleHashTag = (e) => {
-    if (e.key === "Enter" && e.target.value.trim() !== "") {
+    const value = e.target.value.trim();
+
+    // Check if the "Enter" key is pressed or if the input ends with a space or a comma
+    if (e.key === "Enter" || value.endsWith(" ") || value.endsWith(",")) {
       e.preventDefault();
 
-      const trimmedValue = e.target.value.trim();
-      setTags((prevTags) => [...prevTags, trimmedValue]);
+      if (value !== "") {
+        const trimmedValue =
+          value.endsWith(" ") || value.endsWith(",")
+            ? value.slice(0, -1)
+            : value;
 
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        hashTag: [...(prevFormData.hashTag || []), trimmedValue], // Join the array into a single string
-      }));
+        setTags((prevTags) => [...prevTags, trimmedValue]);
 
-      e.target.value = "";
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          hashTag: [...(prevFormData.hashTag || []), trimmedValue],
+        }));
+
+        e.target.value = ""; // Clear the input field
+      }
     }
   };
+  // const handleHashTag = (e) => {
+  //   if (e.key === "Enter" && e.target.value.trim() !== "") {
+  //     e.preventDefault();
+
+  //     const trimmedValue = e.target.value.trim();
+  //     setTags((prevTags) => [...prevTags, trimmedValue]);
+
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       hashTag: [...(prevFormData.hashTag || []), trimmedValue], // Join the array into a single string
+  //     }));
+
+  //     e.target.value = "";
+  //   }
+  // };
   // console.log(tags);
 
   // Image input file save and show image in form
@@ -69,6 +91,11 @@ const CreateBlog = () => {
       blogImg: file,
     });
   };
+  const {
+    mutateAsync: createBlog,
+    isSuccess,
+    isPending,
+  } = useCreateBlog(queryClient);
 
   // Form submit
   const handleSubmit = async (e) => {
@@ -86,23 +113,12 @@ const CreateBlog = () => {
       }
     });
 
-    // console.log(data);
-
-    try {
-      const res = await axios.post(createBlogRoute, data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (res?.status === 201) {
-        toast.success(res?.data?.message);
-        nav("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    createBlog(data);
   };
+
+  if (isSuccess) {
+    return nav("/");
+  }
 
   return (
     <div>
@@ -152,15 +168,16 @@ const CreateBlog = () => {
           {/* <span className="text-red-500">{errors?.name}</span> */}
         </div>
         {/* HashTag */}
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-2 w-full">
           <label htmlFor="hashTag">HashTag</label>
           <div className="flex gap-3">
-            {tags.map((tag) => (
-              <div className="bg-gray-300 rounded-md p-2">
+            {tags?.map((tag, i) => (
+              <div key={i} className="bg-gray-300 rounded-md p-2">
                 <span>{tag}</span>
               </div>
             ))}
           </div>
+
           <input
             id="hashTag"
             name="hashTag"
@@ -169,7 +186,10 @@ const CreateBlog = () => {
             className="customInput"
             onKeyDown={handleHashTag}
           />
-          <span className="text-sm text-gray-500">Press Enter to add hashTags</span>
+
+          <span className="text-sm text-gray-500">
+            Press Enter or ( , ) twice to add hashtag
+          </span>
         </div>
         {/* Content */}
         <div className="flex flex-col gap-y-2">
@@ -186,7 +206,9 @@ const CreateBlog = () => {
         </div>
         <div className="flex flex-col gap-y-5 md:gap-0 md:flex-row justify-between items-center">
           {/* submit btn */}
-          <button className="px-5 py-2 self-start primaryBtn">Create</button>
+          <button className="px-5 py-2 self-start primaryBtn">
+            {isPending ? "Posting..." : "Create"}
+          </button>
         </div>
       </form>
     </div>

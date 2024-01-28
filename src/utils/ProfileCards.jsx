@@ -8,10 +8,11 @@ import { userStore } from "../Global/API/store";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { deleteBlogRoute, likeBlogRoute } from "../Global/API/apiRoute";
+import { deleteBlogRoute, likeBlogRoute } from "../Global/API/blogRoute";
 import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
+const ProfileCards = ({ blog, email, name }) => {
   const {
     _id,
     title,
@@ -24,11 +25,11 @@ const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
     like,
     comments,
   } = blog;
+  const queryClient = useQueryClient();
 
   const userInfo = userStore((store) => store.userInfo);
   const addBlog = userStore((store) => store.addBlog);
   const nav = useNavigate();
-  const likeCount = like ? like.length : 0;
   const commentCount = comments ? comments.length : 0;
   const token = Cookies.get("token");
 
@@ -43,45 +44,21 @@ const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
     }
   };
 
-  // if login userId and likeUserId same like btn will change
-  const match = like?.find((el) => el === userInfo?._id);
-
-  // Like function
-  const handleLike = async () => {
-    if (token) {
-      await axios
-        .post(
-          likeBlogRoute,
-          { blogId: _id },
-          {
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          // console.log(res?.data);
-          setRefresh(!refresh);
-        })
-        .catch((err) => console.log(err));
-      return;
-    }
-    toast.error("You need to login!", { autoClose: 2000 });
-    setTimeout(() => nav("/login"), 3000);
-  };
+  const { mutate } = useMutation({
+    mutationFn: () =>
+      axios.delete(`${import.meta.env.VITE_API}/blog/delete/${_id}`),
+    onSuccess: () => {
+      toast.success("Blog delete successful");
+      queryClient.invalidateQueries({ queryKey: ["Blogs"] });
+    },
+    onError: (err) => console.log(err),
+  });
 
   // Only owner can delete blog --> need blog id
   const handleDelete = async (e) => {
     e.stopPropagation();
     if (token) {
-      await axios
-        .delete(deleteBlogRoute + `/${_id}`)
-        .then((res) => {
-          if (res?.status === 200) toast.success("Blog delete successfully.");
-          setRefresh(!refresh);
-        })
-        .catch((err) => console.log(err));
+      mutate();
       return;
     }
     toast.error("You need to login!", { autoClose: 2000 });
@@ -100,7 +77,7 @@ const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
             <Avatar name={email} />
             <div className="space-y-1">
               <span className="cursor-pointer hover:underline">
-                {userInfo.name}
+                {name}
               </span>
               <p className="text-sm text-lightGray">{moment(date).fromNow()}</p>
             </div>
@@ -108,9 +85,8 @@ const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
           {/* If userId and blog userId is same, can't follow yourself and not same it's ok */}
           {userInfo?._id === blogOwner ? (
             <div className="flex gap-2">
-              <BiSolidPencil className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
               <BiSolidTrashAlt
-                  onClick={handleDelete}
+                onClick={handleDelete}
                 className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
               />
             </div>
@@ -126,16 +102,11 @@ const ProfileCards = ({ blog, email, name, refresh, setRefresh }) => {
         </div>
 
         <div className="absolute -bottom-5 left-[50%] -translate-x-[50%] flex gap-3  rounded-3xl backdrop-blur px-3 py-2 shadow">
-          <LikeBtn
-            handleLike={handleLike}
-            match={match}
-            likeCount={likeCount}
-          />
+          <LikeBtn blogId={_id} userId={userInfo?._id} like={like} />
           <div className="w-[1px] h-[25px] bg-lightGray/30"></div>
           <CommentBtn commentCount={commentCount} />
         </div>
       </div>
-      {/* <div className="self-center w-full h-[1px] bg-gradient-to-r from-transparent via-lightGray to-transparent"></div> */}
     </div>
   );
 };

@@ -1,68 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Card from "../utils/Card";
-import axios from "axios";
-import { getUserDetailRoute } from "../Global/API/apiRoute";
-import { userStore } from "../Global/API/store";
-import Cookies from "js-cookie";
+import { useGetAllBlogs } from "../Hooks/blog";
 
 const Home = () => {
-  const userInfo = userStore((store) => store.userInfo);
-  const addUser = userStore((store) => store.addUser);
-  const [refresh, setRefresh] = useState(false);
-  const [blogs, setBlogs] = useState([]);
-  const token = Cookies.get("token");
-
-  const getAllBlogs = async () => {
-    await axios
-      .get(`${import.meta.env.VITE_API}/blog`)
-      .then((res) => {
-        // Sort blogs in descending order based on created date
-        const sortedBlogs = res?.data?.data.sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
-        );
-        setBlogs(sortedBlogs);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // UserDetail
-  const handleUserDetail = async () => {
-    if (token) {
-      await axios
-        .post(
-          getUserDetailRoute,
-          { userId: userInfo?._id },
-          {
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          addUser(res?.data?.data);
-        })
-        .catch((err) => console.log(err));
-    }
-  };
-
-  useEffect(() => {
-    getAllBlogs();
-    handleUserDetail();
-  }, [refresh]);
-
+  const { data: blogs, isLoading } = useGetAllBlogs();
+  const sortedBlogs = blogs?.data?.data.sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
   return (
     <div className="grid grid-cols-12 space-y-10 mb-20 w-full max-w-[400px] mx-auto">
-      {blogs?.map((blog) => {
-        return (
-          <Card
-            key={blog._id}
-            blog={blog}
-            setRefresh={setRefresh}
-            refresh={refresh}
-          />
-        );
-      })}
+      {isLoading ? (
+        <h1>Loading...</h1>
+      ) : (
+        sortedBlogs?.map((blog) => {
+          return <Card key={blog._id} blog={blog} />;
+        })
+      )}
     </div>
   );
 };

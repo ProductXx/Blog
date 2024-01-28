@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { loginRoute } from "../Global/API/apiRoute";
+import { loginRoute } from "../Global/API/userRoute";
 import loginValidate from "../utils/Validation/loginValidate";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
-import { useStore } from "zustand";
 import { userStore } from "../Global/API/store";
 import { toast } from "react-toastify";
 

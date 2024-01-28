@@ -8,25 +8,30 @@ import {
   followUserRoute,
   getUserDetailRoute,
   getUsersRoute,
-} from "../Global/API/apiRoute";
+} from "../Global/API/userRoute";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ProfileCards from "../utils/ProfileCards";
+import { useGetAllUsers } from "../Hooks/user";
+import { useGetOwnerBlog } from "../Hooks/blog";
 
 const Profile = () => {
   const { id } = useParams();
   const nav = useNavigate();
-  const fetchProfile = userStore((store) => store.fetchProfile);
   const addUser = userStore((store) => store.addUser);
-  const profile = userStore((store) => store.profile);
+  // const profile = userStore((store) => store.profile);
   const userInfo = userStore((store) => store.userInfo);
+  // const addProfile = userStore((store) => store.addProfile);
   const userDetail = userStore((store) => store.fetchUserDetail);
   const token = Cookies.get("token");
-  const [users, setUsers] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+
+  const [profile,setProfile] = useState([])
+  const { data } = useGetAllUsers();
+  const { mutateAsync: profileData } = useGetOwnerBlog();
+  // console.log(profileData())
 
   const allUsers = async () => {
     await axios
@@ -38,13 +43,15 @@ const Profile = () => {
       .catch((err) => console.log(err));
   };
 
-  const showFollowers = () => {
+  const showFollowers = (usersData) => {
+    const users = usersData?.data?.data;
     return users?.filter((user) =>
       profile?.followers?.find((el) => user._id === el)
     );
   };
 
-  const showFollowing = () => {
+  const showFollowing = (usersData) => {
+    const users = usersData?.data?.data;
     return users?.filter((user) =>
       profile?.following?.find((el) => user._id === el)
     );
@@ -68,7 +75,7 @@ const Profile = () => {
         .then((res) => {
           // console.log(res);
           userDetail(userInfo._id, token);
-          setRefresh(!refresh);
+          // setRefresh(!refresh);
         })
         .catch((err) => console.log(err));
       return;
@@ -96,10 +103,13 @@ const Profile = () => {
     setTimeout(() => nav("/login"), 3000);
   };
 
+  // useEffect(() => {
+  //   // fetchProfile(id);
+  //   // allUsers();
+  // }, [id, refresh]);
   useEffect(() => {
-    fetchProfile(id);
-    allUsers();
-  }, [id, refresh]);
+    profileData({ ownerId: id }).then((res) => setProfile(res?.data?.data[0]));
+  }, [id]);
 
   return (
     <div className="flex flex-col items-start gap-5 px-3">
@@ -115,7 +125,10 @@ const Profile = () => {
         </div>
         {profile?._id === userInfo?._id ? (
           <div className="flex gap-2 mt-5">
-            <BiSolidPencil onClick={()=>nav('/EditUser')} className="text-xl border rounded-full w-9 h-9 p-2 text-primary" />
+            <BiSolidPencil
+              onClick={() => nav("/EditUser")}
+              className="text-xl border rounded-full w-9 h-9 p-2 text-primary"
+            />
             <BiSolidTrashAlt
               onClick={handleDelete}
               className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
@@ -158,7 +171,7 @@ const Profile = () => {
         <div className="space-y-2 ">
           <h1 className="text-2xl font-semibold">Followers</h1>
           <div className="flex gap-3 w-40 overflow-hidden">
-            {showFollowers().map((follower) => (
+            {showFollowers(data)?.map((follower) => (
               <div key={follower?._id} className="flex flex-col gap-1">
                 <Avatar
                   name={follower?.email}
@@ -172,7 +185,7 @@ const Profile = () => {
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold">Following</h1>
           <div className="flex gap-3 w-40 overflow-hidden">
-            {showFollowing().map((following) => (
+            {showFollowing(data)?.map((following) => (
               <div key={following?._id} className="flex flex-col gap-1">
                 <Avatar
                   name={following?.email}
@@ -194,8 +207,7 @@ const Profile = () => {
                 blog={blog}
                 email={profile.email}
                 name={profile.name}
-                refresh={refresh}
-                setRefresh={setRefresh}
+                
               />
             );
           })}
