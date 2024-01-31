@@ -21,6 +21,7 @@ import { useGetOwnerBlog } from "../Hooks/blog";
 const Profile = () => {
   const { id } = useParams();
   const nav = useNavigate();
+  
   const addUser = userStore((store) => store.addUser);
   // const profile = userStore((store) => store.profile);
   const userInfo = userStore((store) => store.userInfo);
@@ -107,6 +108,7 @@ const Profile = () => {
   //   // fetchProfile(id);
   //   // allUsers();
   // }, [id, refresh]);
+  
   useEffect(() => {
     profileData({ ownerId: id }).then((res) => setProfile(res?.data?.data[0]));
   }, [id]);

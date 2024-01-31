@@ -6,6 +6,7 @@ import { BiHome, BiHomeAlt2, BiSolidCategory } from "react-icons/bi";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { RxCross2 } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
+import { TbMessageCircleBolt } from "react-icons/tb";
 
 const BottomNavbar = () => {
   const { scrollY } = useScroll();
@@ -61,8 +62,8 @@ const BottomNavbar = () => {
       id: 1,
       variant: navMenu1,
       delay: 0.1,
-      link: "/",
-      icon: <AiFillHome />,
+      link: "/message",
+      icon: <TbMessageCircleBolt />,
     },
     {
       id: 2,
