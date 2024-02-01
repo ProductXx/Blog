@@ -8,11 +8,16 @@ import { getSingleBlogRoute } from "../Global/API/blogRoute";
 import Cookies from "js-cookie";
 import { useLocation } from "react-router-dom";
 import { useGetSingleBlog } from "../Hooks/blog";
+import { connectSocket } from "../Global/Socket/connectSocket";
+import { useSocket } from "../Hooks/socket";
 
 const Detail = () => {
+  const socket = useSocket("http://localhost:8000");
   const [blog, setBlog] = useState();
   const [refresh, setRefresh] = useState(false);
   const storeBlog = userStore((store) => store.blog);
+  const userInfo = userStore((store) => store.userInfo);
+  const addActiveUsers = userStore((store) => store.addActiveUsers);
   const { _id } = storeBlog;
   const location = useLocation();
 
@@ -30,10 +35,13 @@ const Detail = () => {
   // useEffect(() => {
   //   getSingleBlog();
   // }, [_id, refresh]);
-  
+
   useEffect(() => {
-    getSingleBlog({ _id }).then(res=>setBlog(res?.data?.data[0]));
-  }, []);
+    getSingleBlog({ _id }).then((res) => setBlog(res?.data?.data[0]));
+    if (userInfo && socket) {
+      connectSocket(userInfo, socket, addActiveUsers);
+    }
+  }, [socket]);
 
   return (
     <div>
@@ -48,10 +56,7 @@ const Detail = () => {
       </div>
 
       <div className="relative">
-        <CommentForm
-          comments={blog?.comments}
-          blogId={blog?._id}
-        />
+        <CommentForm comments={blog?.comments} blogId={blog?._id} />
       </div>
     </div>
   );

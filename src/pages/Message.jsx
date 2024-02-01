@@ -5,43 +5,53 @@ import Avatar from "../utils/Avatar";
 import { useGetAllUsers } from "../Hooks/user";
 import { TbMessageCircleBolt } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
+// import { connectSocket } from "../Global/Socket/connectSocket";
 
 const Message = () => {
-  const socket = useSocket("http://localhost:8000");
+  // const socket = useSocket("http://localhost:8000");
 
   const userInfo = userStore((store) => store.userInfo);
+  const activeUser = userStore((store) => store.activeUsers);
+  // const addActiveUsers = userStore((store) => store.addActiveUsers);
   const { data: users } = useGetAllUsers();
   // console.log(userInfo, users);
 
   const nav = useNavigate();
 
-  const [activeUser, setActiveUser] = useState([]);
+  // const [activeUser, setActiveUser] = useState([]);
 
-  console.log(activeUser);
+  // console.log(activeUser);
   // console.log(userInfo);
 
-  useEffect(() => {
-    if (socket) {
-      socket.on("connect", () => {
-        console.log("Connected to Socket.IO server");
-      });
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.on("connect", () => {
+  //       console.log("Connected to Socket.IO server");
+  //     });
 
-      socket.emit("activeUser", userInfo);
+  //     socket.emit("activeUser", userInfo);
 
-      socket.on("showActiveUser", (data) => {
-        setActiveUser(data);
-      });
+  //     socket.on("showActiveUser", (data) => {
+  //       addActiveUsers(data);
+  //     });
 
-      socket.on("disconnect", () => {
-        console.log("Disconnected from Socket.IO server");
-      });
-    }
-  }, [socket]);
+  //     socket.on("disconnect", () => {
+  //       console.log("Disconnected from Socket.IO server");
+  //     });
+  //   }
+  // }, [socket]);
+  // useEffect(() => {
+  //   if (userInfo && socket) {
+  //     connectSocket(userInfo, socket, addActiveUsers);
+  //   }
+  // }, [socket]);
 
   // for showing active
   const isMatch = users?.data?.data.some((user) =>
     activeUser?.some((acusr) => acusr?.userInfo?._id === user?._id)
   );
+
+  // console.log(activeUser)
 
   return (
     <div>

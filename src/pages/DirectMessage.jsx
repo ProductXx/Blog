@@ -35,7 +35,8 @@ const DirectMessage = () => {
   };
 
   // for showing active
-  const [isActive, setIsActive] = useState([]);
+  // const [isActive, setIsActive] = useState([]);
+  const isActive = userStore(store=>store.activeUsers)
   // console.log(isActive);
   const [profile, setProfile] = useState([]);
   // console.log(profile);
@@ -53,11 +54,11 @@ const DirectMessage = () => {
   useEffect(() => {
     if (socket) {
       // for some info
-      socket.emit("activeUser", userInfo);
+      // socket.emit("activeUser", userInfo);
 
-      socket.on("showActiveUser", (data) => {
-        setIsActive(data);
-      });
+      // socket.on("showActiveUser", (data) => {
+      //   setIsActive(data);
+      // });
 
       // for message
       socket.on("messageSent", (sentMessage) => {
