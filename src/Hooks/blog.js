@@ -6,7 +6,6 @@ import {
   deleteCmt,
   getAllBlogs,
   getOwnerBlog,
-  getSingleBlog,
   likeBlogs,
 } from "../Global/API/blogRoute";
 
@@ -35,7 +34,7 @@ export const useLikeBlog = (queryClient) => {
 export const useCommentBlog = (queryClient) => {
   return useMutation({
     mutationFn: commentBlog,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Blogs"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Blog"] }),
   });
 };
 
@@ -44,16 +43,8 @@ export const useDeleteCmt = (queryClient) => {
     mutationFn: deleteCmt,
     onSuccess: () => {
       toast.success("Comment is deleted.");
-      queryClient.invalidateQueries({ queryKey: ["Blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["Blog"] });
     },
-  });
-};
-
-export const useGetSingleBlog = () => {
-  return useMutation({
-    mutationFn: getSingleBlog,
-    onSuccess: (data) => data,
-    onError: (err) => console.log(err),
   });
 };
 

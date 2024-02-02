@@ -53,22 +53,6 @@ const CreateBlog = () => {
       }
     }
   };
-  // const handleHashTag = (e) => {
-  //   if (e.key === "Enter" && e.target.value.trim() !== "") {
-  //     e.preventDefault();
-
-  //     const trimmedValue = e.target.value.trim();
-  //     setTags((prevTags) => [...prevTags, trimmedValue]);
-
-  //     setFormData((prevFormData) => ({
-  //       ...prevFormData,
-  //       hashTag: [...(prevFormData.hashTag || []), trimmedValue], // Join the array into a single string
-  //     }));
-
-  //     e.target.value = "";
-  //   }
-  // };
-  // console.log(tags);
 
   // Image input file save and show image in form
   const handleFileChange = (e) => {

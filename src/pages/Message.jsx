@@ -1,63 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useSocket } from "../Hooks/socket";
+import React from "react";
 import { userStore } from "../Global/API/store";
 import Avatar from "../utils/Avatar";
 import { useGetAllUsers } from "../Hooks/user";
 import { TbMessageCircleBolt } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-// import { connectSocket } from "../Global/Socket/connectSocket";
 
 const Message = () => {
-  // const socket = useSocket("http://localhost:8000");
-
   const userInfo = userStore((store) => store.userInfo);
   const activeUser = userStore((store) => store.activeUsers);
-  // const addActiveUsers = userStore((store) => store.addActiveUsers);
   const { data: users } = useGetAllUsers();
   // console.log(userInfo, users);
 
   const nav = useNavigate();
 
-  // const [activeUser, setActiveUser] = useState([]);
-
-  // console.log(activeUser);
-  // console.log(userInfo);
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("connect", () => {
-  //       console.log("Connected to Socket.IO server");
-  //     });
-
-  //     socket.emit("activeUser", userInfo);
-
-  //     socket.on("showActiveUser", (data) => {
-  //       addActiveUsers(data);
-  //     });
-
-  //     socket.on("disconnect", () => {
-  //       console.log("Disconnected from Socket.IO server");
-  //     });
-  //   }
-  // }, [socket]);
-  // useEffect(() => {
-  //   if (userInfo && socket) {
-  //     connectSocket(userInfo, socket, addActiveUsers);
-  //   }
-  // }, [socket]);
-
   // for showing active
-  const isMatch = users?.data?.data.some((user) =>
-    activeUser?.some((acusr) => acusr?.userInfo?._id === user?._id)
-  );
-
-  // console.log(activeUser)
+  // const isMatch = users?.data?.data.some((user) =>
+  //   activeUser?.some((acusr) => acusr?.userInfo?._id === user?._id)
+  // );
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">All Users</h1>
       <div className="space-y-3">
-        {users?.data?.data?.map((user) => {
+        {users?.map((user) => {
           const isActive = activeUser?.some(
             (acusr) => acusr?.userInfo?._id === user?._id
           );

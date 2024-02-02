@@ -1,47 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import moment from "moment";
 import HashTag from "../utils/HashTag";
 import CommentForm from "../utils/CommentForm";
 import axios from "axios";
 import { userStore } from "../Global/API/store";
-import { getSingleBlogRoute } from "../Global/API/blogRoute";
-import Cookies from "js-cookie";
-import { useLocation } from "react-router-dom";
-import { useGetSingleBlog } from "../Hooks/blog";
-import { connectSocket } from "../Global/Socket/connectSocket";
-import { useSocket } from "../Hooks/socket";
+import { useQuery } from "@tanstack/react-query";
 
 const Detail = () => {
-  const socket = useSocket("http://localhost:8000");
-  const [blog, setBlog] = useState();
-  const [refresh, setRefresh] = useState(false);
   const storeBlog = userStore((store) => store.blog);
-  const userInfo = userStore((store) => store.userInfo);
-  const addActiveUsers = userStore((store) => store.addActiveUsers);
   const { _id } = storeBlog;
-  const location = useLocation();
 
-  const { mutateAsync: getSingleBlog, data } = useGetSingleBlog();
-
-  // const getSingleBlog = async () => {
-  //   await axios
-  //     .post("http://localhost:8000/api/v1/blog/single-blog", { _id })
-  //     .then((res) => {
-  //       setBlog(res?.data?.data[0]);
-  //     })
-  //     .catch((err) => console.log(err));
-  // };
-
-  // useEffect(() => {
-  //   getSingleBlog();
-  // }, [_id, refresh]);
-
-  useEffect(() => {
-    getSingleBlog({ _id }).then((res) => setBlog(res?.data?.data[0]));
-    if (userInfo && socket) {
-      connectSocket(userInfo, socket, addActiveUsers);
-    }
-  }, [socket]);
+  const { data: blog } = useQuery({
+    queryKey: ["Blog"],
+    queryFn: () =>
+      axios
+        .get(`${import.meta.env.VITE_API}/blog/single-blog/${_id}`)
+        .then((res) => res?.data?.data[0]),
+  });
 
   return (
     <div>

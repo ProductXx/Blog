@@ -2,12 +2,11 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { request } from "./api";
 
-export const getAllBlogRoute = `/blog`;
-export const createBlogRoute = `${import.meta.env.VITE_API}/blog/create`;
-export const getSingleBlogRoute = `/blog/single-blog`;
-export const likeBlogRoute = `/blog/like`;
-export const commentBlogRoute = `/blog/comment`;
-export const deleteCmtRoute = `/blog/comment/delete`;
+const getAllBlogRoute = `/blog`;
+const createBlogRoute = `${import.meta.env.VITE_API}/blog/create`;
+const likeBlogRoute = `/blog/like`;
+const commentBlogRoute = `/blog/comment`;
+const deleteCmtRoute = `/blog/comment/delete`;
 export const deleteBlogRoute = `/blog/delete`;
 export const getOwnerBlogRoute = `/blog/owner-blogs`;
 
@@ -44,10 +43,6 @@ const deleteCmt = async (id) => {
   return request({ url: deleteCmtRoute, method: "delete", data: id });
 };
 
-const getSingleBlog = async (id) => {
-  return request({ url: getSingleBlogRoute, method: "post", data: id });
-};
-
 const getOwnerBlog = async (id) => {
   return request({ url: getOwnerBlogRoute, method: "post", data: id });
 };
@@ -58,6 +53,5 @@ export {
   likeBlogs,
   commentBlog,
   deleteCmt,
-  getSingleBlog,
   getOwnerBlog,
 };

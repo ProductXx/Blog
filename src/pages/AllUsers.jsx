@@ -1,18 +1,18 @@
 import React from "react";
 import Avatar from "../utils/Avatar";
 import { userStore } from "../Global/API/store";
-import { useGetAllUsers } from "../Hooks/user";
 import FollowBtn from "../utils/FollowBtn";
+import { useGetAllUsers } from "../Hooks/user";
 
 const AllUsers = () => {
   const userInfo = userStore((store) => store.userInfo);
   const { data: users } = useGetAllUsers();
- 
+
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">All Users</h1>
       <div className="space-y-3">
-        {users?.data?.data?.map((user) =>
+        {users?.map((user) =>
           user._id === userInfo._id ? null : (
             <div
               key={user._id}

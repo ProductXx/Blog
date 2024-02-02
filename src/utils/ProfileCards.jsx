@@ -8,9 +8,9 @@ import { userStore } from "../Global/API/store";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { deleteBlogRoute, likeBlogRoute } from "../Global/API/blogRoute";
-import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
+import { BiSolidTrashAlt } from "react-icons/bi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import DeleteBtn from "./DeleteBtn";
 
 const ProfileCards = ({ blog, email, name }) => {
   const {
@@ -44,27 +44,6 @@ const ProfileCards = ({ blog, email, name }) => {
     }
   };
 
-  const { mutate } = useMutation({
-    mutationFn: () =>
-      axios.delete(`${import.meta.env.VITE_API}/blog/delete/${_id}`),
-    onSuccess: () => {
-      toast.success("Blog delete successful");
-      queryClient.invalidateQueries({ queryKey: ["Blogs"] });
-    },
-    onError: (err) => console.log(err),
-  });
-
-  // Only owner can delete blog --> need blog id
-  const handleDelete = async (e) => {
-    e.stopPropagation();
-    if (token) {
-      mutate();
-      return;
-    }
-    toast.error("You need to login!", { autoClose: 2000 });
-    setTimeout(() => nav("/login"), 3000);
-  };
-
   return (
     <div
       onClick={handleDetail}
@@ -76,21 +55,12 @@ const ProfileCards = ({ blog, email, name }) => {
           <div className="flex space-x-3">
             <Avatar name={email} />
             <div className="space-y-1">
-              <span className="cursor-pointer hover:underline">
-                {name}
-              </span>
+              <span className="cursor-pointer hover:underline">{name}</span>
               <p className="text-sm text-lightGray">{moment(date).fromNow()}</p>
             </div>
           </div>
           {/* If userId and blog userId is same, can't follow yourself and not same it's ok */}
-          {userInfo?._id === blogOwner ? (
-            <div className="flex gap-2">
-              <BiSolidTrashAlt
-                onClick={handleDelete}
-                className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
-              />
-            </div>
-          ) : null}
+          {userInfo?._id === blogOwner ? <DeleteBtn blogId={_id}/> : null}
         </div>
         <div className="flex flex-col gap-2 p-2 mb-3">
           <h1 className="font-bold text-xl uppercase">{title}</h1>

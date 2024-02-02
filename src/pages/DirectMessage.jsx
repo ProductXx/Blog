@@ -11,7 +11,7 @@ const DirectMessage = () => {
   const { id } = useParams();
   const { mutateAsync: profileData } = useGetOwnerBlog();
   const userInfo = userStore((store) => store.userInfo);
-  const socket = useSocket();
+  const socket = useSocket("http://localhost:8000");
 
   const [messages, setMessages] = useState([]);
   const [msgHistory, setMsgHistory] = useState([]);
@@ -28,18 +28,17 @@ const DirectMessage = () => {
         }
       );
       setMsgHistory(response?.data?.messages);
-      console.log(response)
+      // console.log(response);
     } catch (error) {
       console.log(error);
     }
   };
 
   // for showing active
-  // const [isActive, setIsActive] = useState([]);
-  const isActive = userStore(store=>store.activeUsers)
-  // console.log(isActive);
+  const isActive = userStore((store) => store.activeUsers);
+  const addActiveUsers = userStore((store) => store.addActiveUsers);
+
   const [profile, setProfile] = useState([]);
-  // console.log(profile);
 
   const isUserActive = isActive.some(
     (act) => act?.userInfo?._id === profile?._id
@@ -54,11 +53,11 @@ const DirectMessage = () => {
   useEffect(() => {
     if (socket) {
       // for some info
-      // socket.emit("activeUser", userInfo);
+      socket.emit("activeUser", userInfo);
 
-      // socket.on("showActiveUser", (data) => {
-      //   setIsActive(data);
-      // });
+      socket.on("showActiveUser", (data) => {
+        addActiveUsers(data);
+      });
 
       // for message
       socket.on("messageSent", (sentMessage) => {

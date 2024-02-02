@@ -11,8 +11,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { userStore } from "../Global/API/store";
-import { deleteBlogRoute } from "../Global/API/blogRoute";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import DeleteBtn from "./DeleteBtn";
 
 const Card = ({ blog }) => {
   const {
@@ -34,36 +34,15 @@ const Card = ({ blog }) => {
   const commentCount = comments ? comments.length : 0;
   const token = Cookies.get("token");
 
-  // Detail
+  // Store blog in userStore and navigate Detail route
   const handleDetail = () => {
     if (token) {
       addBlog(blog);
-      nav(`/detail/${title}`, { state: { id: _id } });
+      nav(`/detail/${title}`);
     } else {
       toast.error("You need to login!", { autoClose: 2000 });
       setTimeout(() => nav("/login"), 3000);
     }
-  };
-
-  const { mutate } = useMutation({
-    mutationFn: () =>
-      axios.delete(`${import.meta.env.VITE_API}/blog/delete/${_id}`),
-    onSuccess: () => {
-      toast.success("Blog delete successful");
-      queryClient.invalidateQueries({ queryKey: ["Blogs"] });
-    },
-    onError: (err) => console.log(err),
-  });
-
-  // Only owner can delete blog --> need blog id
-  const handleDelete = async (e) => {
-    e.stopPropagation();
-    if (token) {
-      mutate();
-      return;
-    }
-    toast.error("You need to login!", { autoClose: 2000 });
-    setTimeout(() => nav("/login"), 3000);
   };
 
   return (
@@ -75,6 +54,7 @@ const Card = ({ blog }) => {
         <div className="flex justify-between items-center gap-2">
           {/* User info and when u click direct to user profile */}
           <div className="flex space-x-3">
+            {/* Avatar and Name */}
             <Avatar name={ownerInfo.email} id={ownerInfo._id} />
             <div
               onClick={(e) => {
@@ -91,16 +71,7 @@ const Card = ({ blog }) => {
           </div>
           {/* If userId and blog userId is same, can't follow yourself and not same it's ok */}
           {userInfo?._id === ownerInfo._id ? (
-            <div className="flex gap-2">
-              <BiSolidTrashAlt
-                onClick={handleDelete}
-                // onClick={(e) => {
-                //   e.stopPropagation();
-                //   toast.error("Blog Delete is under maintenance !!");
-                // }}
-                className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
-              />
-            </div>
+            <DeleteBtn blogId={_id}/>
           ) : (
             <FollowBtn userId={userInfo?._id} ownerInfo={ownerInfo} />
           )}
@@ -120,7 +91,6 @@ const Card = ({ blog }) => {
           <CommentBtn commentCount={commentCount} />
         </div>
       </div>
-      {/* <div className="self-center w-full h-[1px] bg-gradient-to-r from-transparent via-lightGray to-transparent"></div> */}
     </div>
   );
 };

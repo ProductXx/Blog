@@ -1,15 +1,23 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  followUser,
-  getAllUsers,
-  getUserDetail,
-} from "../Global/API/userRoute";
+import { followUser, getUserDetail } from "../Global/API/userRoute";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 // Query
-export const useGetAllUsers = () => {
-  return useQuery({ queryKey: ["Users"], queryFn: getAllUsers });
-};
+export const useGetAllUsers = () =>
+  useQuery({
+    queryKey: ["Users"],
+    queryFn: async () =>
+      await axios
+        .get(`${import.meta.env.VITE_API}/user`, {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        })
+        .then((res) => res?.data?.data),
+  });
 
 // Mutation
 export const useFollowUser = (queryClient) => {

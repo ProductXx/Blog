@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const addUser = userStore(store=>store.addUser);
+  const storeToken = userStore(store=>store.storeToken);
   const nav = useNavigate();
   const initialState = {
     email: "",
@@ -36,7 +37,7 @@ const Login = () => {
       await axios
         .post(loginRoute, formData)
         .then((res) => {
-          addUser(res?.data?.data)
+          addUser(res?.data?.data);
           Cookies.set("token", res?.data?.token);
           nav("/");
         })
