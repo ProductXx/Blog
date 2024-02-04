@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useFollowUser, useGetUserDetail } from "../Hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { userStore } from "../Global/Store/store";
@@ -14,27 +14,30 @@ const FollowBtn = ({ ownerInfo }) => {
 
   const isFollowing = loginUser?.following.some((id) => id === ownerInfo._id);
 
-  useEffect(() => {
-    fetchLoginUserDetail({ userId: loginUser?._id }).then((res) =>
-      addFollowing(res?.data?.data)
-    );
-  }, [isPending]);
+  const handleClick = useCallback(() => {
+    followUser({ userId: ownerInfo._id }).then(() => {
+      fetchLoginUserDetail({ userId: loginUser?._id }).then((res) => {
+        addFollowing(res?.data?.data);
+      });
+    });
+  }, [followUser, fetchLoginUserDetail, addFollowing, loginUser, ownerInfo]);
 
   return (
     <div>
-      <div
+      <button
+        disabled={isPending}
         onClick={(e) => {
           e.stopPropagation();
-          followUser({ userId: ownerInfo._id });
+          handleClick();
         }}
         className={`py-1 px-4 rounded ${
-          isFollowing ? "bg-primary text-secondary" : "bg-lightWhite"
+          isFollowing
+            ? "bg-primary text-secondary"
+            : "bg-lightWhite text-lightGray"
         } transition-all`}
       >
         <div className="flex space-x-2 items-center transition-all">
-          {isPending ? (
-            <>...</>
-          ) : isFollowing ? (
+          {isFollowing ? (
             <>
               <span>Following</span>
               <FaCheckCircle />
@@ -46,7 +49,7 @@ const FollowBtn = ({ ownerInfo }) => {
             </>
           )}
         </div>
-      </div>
+      </button>
     </div>
   );
 };
