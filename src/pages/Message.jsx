@@ -13,19 +13,15 @@ const Message = () => {
 
   const nav = useNavigate();
 
-  // for showing active
-  // const isMatch = users?.data?.data.some((user) =>
-  //   activeUser?.some((acusr) => acusr?.loginUser?._id === user?._id)
-  // );
-
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">All Users</h1>
       <div className="space-y-3">
         {users?.map((user) => {
           const isActive = activeUser?.some(
-            (acusr) => acusr?.loginUser?._id === user?._id
+            (acusr) => acusr?.userInfo?._id === user?._id
           );
+
           // for showing all users
           return user._id === loginUser._id ? null : (
             <div

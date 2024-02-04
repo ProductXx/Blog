@@ -41,7 +41,7 @@ const DirectMessage = () => {
   const [profile, setProfile] = useState([]);
 
   const isUserActive = isActive.some(
-    (act) => act?.loginUser?._id === profile?._id
+    (act) => act?.userInfo?._id === profile?._id
   );
 
   useEffect(() => {
@@ -82,7 +82,11 @@ const DirectMessage = () => {
   }, [socket]);
 
   const sendMessage = (message) => {
-    socket.emit("Message", { senderId: loginUser._id, receiverId: id, message });
+    socket.emit("Message", {
+      senderId: loginUser._id,
+      receiverId: id,
+      message,
+    });
   };
 
   const renderMessageHistory = () => {
