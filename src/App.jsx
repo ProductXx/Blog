@@ -7,33 +7,33 @@ import "react-toastify/dist/ReactToastify.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { useSocket } from "./Hooks/socket";
-import { userStore } from "./Global/API/store";
+import { userStore } from "./Global/Store/store";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const location = useLocation();
   const socket = useSocket("http://localhost:8000");
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const addActiveUsers = userStore((store) => store.addActiveUsers);
 
   useEffect(() => {
-    if (userInfo && socket) {
+    if (loginUser && socket) {
       socket.on("connect", () => {
         console.log("Connected to Socket.IO server");
       });
-    
-      socket.emit("activeUser", userInfo);
-    
+
+      socket.emit("activeUser", loginUser);
+
       socket.on("showActiveUser", (data) => {
         addActiveUsers(data);
       });
-    
+
       socket.on("disconnect", () => {
         console.log("Disconnected from Socket.IO server");
       });
     }
-  }, [socket, userInfo, location]);
+  }, [socket, loginUser, location]);
 
   return (
     <QueryClientProvider client={queryClient}>

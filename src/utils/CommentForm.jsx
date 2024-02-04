@@ -3,14 +3,14 @@ import { toast } from "react-toastify";
 import { IoIosSend } from "react-icons/io";
 import Avatar from "./Avatar";
 import { BiSolidTrashAlt } from "react-icons/bi";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import { useCommentBlog, useDeleteCmt } from "../Hooks/blog";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetAllUsers } from "../Hooks/user";
 
 const CommentForm = ({ comments, blogId }) => {
   const [comment, setComment] = useState("");
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const queryClient = useQueryClient();
 
   const { data: users } = useGetAllUsers();
@@ -55,7 +55,7 @@ const CommentForm = ({ comments, blogId }) => {
                       {cmtUserName(cmt)?.name}
                     </span>
                   </div>
-                  {userInfo?._id === cmt?.userId ? (
+                  {loginUser?._id === cmt?.userId ? (
                     <div className="flex gap-2">
                       <BiSolidTrashAlt
                         onClick={() => deleteCmt({ commentId: cmt?._id })}

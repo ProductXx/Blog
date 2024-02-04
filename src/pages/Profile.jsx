@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import Avatar from "../utils/Avatar";
 import { deleteUserRoute } from "../Global/API/userRoute";
 import Cookies from "js-cookie";
@@ -11,10 +11,11 @@ import { toast } from "react-toastify";
 import ProfileCards from "../utils/ProfileCards";
 import { useGetAllUsers } from "../Hooks/user";
 import { useGetOwnerBlog } from "../Hooks/blog";
+import FollowBtn from "../utils/FollowBtn";
 
 const Profile = () => {
   const addUser = userStore((store) => store.addUser);
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
 
   const { id } = useParams();
   const nav = useNavigate();
@@ -25,15 +26,13 @@ const Profile = () => {
   const { mutateAsync: profileData } = useGetOwnerBlog();
 
   const showFollowers = (usersData) => {
-    const users = usersData?.data?.data;
-    return users?.filter((user) =>
+    return usersData?.filter((user) =>
       profile?.followers?.find((el) => user._id === el)
     );
   };
 
   const showFollowing = (usersData) => {
-    const users = usersData?.data?.data;
-    return users?.filter((user) =>
+    return usersData?.filter((user) =>
       profile?.following?.find((el) => user._id === el)
     );
   };
@@ -65,9 +64,12 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col items-start gap-5 px-3">
+      {/* User Info */}
       <div className="flex justify-between items-start w-full">
         <div className="space-y-3">
+          {/* Avatar */}
           <Avatar name={profile?.email} size={"lg"} />
+          {/* Name and email */}
           <div className="space-y-2">
             <div>
               <h1 className="font-bold text-2xl">{profile.name}</h1>
@@ -75,7 +77,8 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        {profile?._id === userInfo?._id ? (
+        {/* If loginUser show Delete and Edit */}
+        {profile?._id === loginUser?._id ? (
           <div className="flex gap-2 mt-5">
             <BiSolidPencil
               onClick={() => nav("/EditUser")}
@@ -86,21 +89,27 @@ const Profile = () => {
               className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
             />
           </div>
-        ) : null}
+        ) : (
+          <FollowBtn ownerInfo={profile} />
+        )}
       </div>
+      {/* Divider */}
       <div className="self-center w-full h-[1px] bg-gradient-to-r from-transparent via-lightWhite to-transparent"></div>
-
+      {/* Followers and Blogs info */}
       <div className="grid grid-cols-3 border-b pb-3 w-full">
+        {/* blog */}
         <div>
           <h1 className="font-bold text-2xl">{profile?.blogs?.length}</h1>
           <span className="font-semibold">Blogs</span>
         </div>
+        {/* Follower */}
         <div>
           <h1 className="font-bold text-2xl">
             {profile?.followers ? profile?.followers?.length : 0}
           </h1>
           <span className="font-semibold">Followers</span>
         </div>
+        {/* Following */}
         <div>
           <h1 className="font-bold text-2xl">
             {profile?.following ? profile?.following?.length : 0}
@@ -108,36 +117,31 @@ const Profile = () => {
           <span className="font-semibold">Following</span>
         </div>
       </div>
+      {/* Show Followers Avatar */}
       <div className="w-full grid grid-cols-2">
         <div className="space-y-2 ">
           <h1 className="text-2xl font-semibold">Followers</h1>
           <div className="flex gap-3 w-40 overflow-hidden">
             {showFollowers(data)?.map((follower) => (
               <div key={follower?._id} className="flex flex-col gap-1">
-                <Avatar
-                  name={follower?.email}
-                  id={follower?._id}
-                  stack={true}
-                />
+                <Avatar name={follower?.email} stack={true} />
               </div>
             ))}
           </div>
         </div>
+        {/* Show Following Avatar */}
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold">Following</h1>
           <div className="flex gap-3 w-40 overflow-hidden">
             {showFollowing(data)?.map((following) => (
               <div key={following?._id} className="flex flex-col gap-1">
-                <Avatar
-                  name={following?.email}
-                  id={following?._id}
-                  stack={true}
-                />
+                <Avatar name={following?.email} stack={true} />
               </div>
             ))}
           </div>
         </div>
       </div>
+      {/* Blogs */}
       <div className="w-full space-y-3">
         <h1 className="text-3xl font-bold">Blogs</h1>
         <div className="grid grid-cols-12 space-y-10 mb-20 w-full max-w-[400px] mx-auto">

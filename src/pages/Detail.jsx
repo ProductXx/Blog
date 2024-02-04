@@ -3,7 +3,7 @@ import moment from "moment";
 import HashTag from "../utils/HashTag";
 import CommentForm from "../utils/CommentForm";
 import axios from "axios";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import { useQuery } from "@tanstack/react-query";
 
 const Detail = () => {

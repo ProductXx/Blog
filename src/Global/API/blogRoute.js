@@ -2,21 +2,13 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { request } from "./api";
 
-const getAllBlogRoute = `/blog`;
 const createBlogRoute = `${import.meta.env.VITE_API}/blog/create`;
 const likeBlogRoute = `/blog/like`;
 const commentBlogRoute = `/blog/comment`;
 const deleteCmtRoute = `/blog/comment/delete`;
-export const deleteBlogRoute = `/blog/delete`;
 export const getOwnerBlogRoute = `/blog/owner-blogs`;
 
 const token = Cookies.get("token");
-
-// GET
-// Sort all blogs by descending order based on created date
-const getAllBlogs = () => {
-  return request({ url: getAllBlogRoute });
-};
 
 // POST
 const createBlog = async (body) => {
@@ -47,11 +39,4 @@ const getOwnerBlog = async (id) => {
   return request({ url: getOwnerBlogRoute, method: "post", data: id });
 };
 
-export {
-  getAllBlogs,
-  createBlog,
-  likeBlogs,
-  commentBlog,
-  deleteCmt,
-  getOwnerBlog,
-};
+export { createBlog, likeBlogs, commentBlog, deleteCmt, getOwnerBlog };

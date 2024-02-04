@@ -4,15 +4,10 @@ import {
   commentBlog,
   createBlog,
   deleteCmt,
-  getAllBlogs,
   getOwnerBlog,
   likeBlogs,
 } from "../Global/API/blogRoute";
 
-// Query
-export const useGetAllBlogs = () => {
-  return useQuery({ queryKey: ["Blogs"], queryFn: getAllBlogs });
-};
 
 // Mutation
 export const useCreateBlog = (queryClient) => {

@@ -1,9 +1,14 @@
 import React, { useMemo } from "react";
 import Card from "../utils/Card";
-import { useGetAllBlogs } from "../Hooks/blog";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const Home = () => {
-  const { data: blogs, isLoading } = useGetAllBlogs();
+  // Get All Blogs
+  const { data: blogs, isLoading } = useQuery({
+    queryKey: ["Blogs"],
+    queryFn: () => axios.get(`${import.meta.env.VITE_API}/blog`),
+  });
 
   // Sorted Blogs descending order by date
   const sortedBlogs = useMemo(() => {

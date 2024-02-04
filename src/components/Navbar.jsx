@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { BiLogIn } from "react-icons/bi";
 import Avatar from "../utils/Avatar";
 import Cookies from "js-cookie";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 
 const Navbar = () => {
-  const user = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const token = Cookies.get("token");
   const [hidden, setHidden] = useState(false);
   const { scrollY } = useScroll();
@@ -43,8 +43,8 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center space-x-5">
-          {user && token ? (
-            <Avatar id={user._id} />
+          {loginUser && token ? (
+            <Avatar id={loginUser._id} />
           ) : (
             <>
               <Link to={"/login"} className="flex items-center gap-x-2">

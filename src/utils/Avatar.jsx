@@ -1,15 +1,15 @@
 import React from "react";
 import { createAvatar } from "@dicebear/core";
-import { userStore } from "../Global/API/store";
-import { adventurer, shapes, thumbs } from "@dicebear/collection";
+import { userStore } from "../Global/Store/store";
+import { adventurer } from "@dicebear/collection";
 import { useNavigate } from "react-router-dom";
 
 const Avatar = ({ name, id, size, stack }) => {
-  const user = userStore((store) => store.userInfo);
   const nav = useNavigate();
-  const seed = name || user.email;
+  const loginUser = userStore((store) => store.loginUser);
 
   // Generate Random Avatar base on Username
+  const seed = name || loginUser?.email;
   const avatar = createAvatar(adventurer, {
     seed: seed,
   });

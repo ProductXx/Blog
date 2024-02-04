@@ -4,13 +4,13 @@ import { useGetOwnerBlog } from "../Hooks/blog";
 import Avatar from "../utils/Avatar";
 import MessageForm from "../utils/MessageForm";
 import { useSocket } from "../Hooks/socket";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import axios from "axios";
 
 const DirectMessage = () => {
   const { id } = useParams();
   const { mutateAsync: profileData } = useGetOwnerBlog();
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const socket = useSocket("http://localhost:8000");
 
   const [messages, setMessages] = useState([]);
@@ -23,7 +23,7 @@ const DirectMessage = () => {
       const response = await axios.post(
         "http://localhost:8000/api/v1/message",
         {
-          senderId: userInfo?._id,
+          senderId: loginUser?._id,
           receiverId: id,
         }
       );
@@ -41,7 +41,7 @@ const DirectMessage = () => {
   const [profile, setProfile] = useState([]);
 
   const isUserActive = isActive.some(
-    (act) => act?.userInfo?._id === profile?._id
+    (act) => act?.loginUser?._id === profile?._id
   );
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const DirectMessage = () => {
   useEffect(() => {
     if (socket) {
       // for some info
-      socket.emit("activeUser", userInfo);
+      socket.emit("activeUser", loginUser);
 
       socket.on("showActiveUser", (data) => {
         addActiveUsers(data);
@@ -82,7 +82,7 @@ const DirectMessage = () => {
   }, [socket]);
 
   const sendMessage = (message) => {
-    socket.emit("Message", { senderId: userInfo._id, receiverId: id, message });
+    socket.emit("Message", { senderId: loginUser._id, receiverId: id, message });
   };
 
   const renderMessageHistory = () => {

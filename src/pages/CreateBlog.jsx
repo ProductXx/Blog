@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { BiImageAdd } from "react-icons/bi";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import { useNavigate } from "react-router-dom";
 import { useCreateBlog } from "../Hooks/blog";
 import { useQueryClient } from "@tanstack/react-query";
 
 const CreateBlog = () => {
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const [tags, setTags] = useState([]);
   const nav = useNavigate();
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ const CreateBlog = () => {
   const initialState = {
     title: "",
     blogImg: {},
-    author_name: userInfo.name,
+    author_name: loginUser.name,
     hashTag: [],
     content: "",
   };

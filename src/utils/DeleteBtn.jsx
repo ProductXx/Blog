@@ -30,6 +30,7 @@ const DeleteBtn = ({blogId}) => {
     toast.error("You need to login!", { autoClose: 2000 });
     setTimeout(() => nav("/login"), 3000);
   };
+  
   return (
     <div className="flex gap-2">
       <BiSolidTrashAlt

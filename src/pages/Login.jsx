@@ -4,12 +4,11 @@ import loginValidate from "../utils/Validation/loginValidate";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const addUser = userStore(store=>store.addUser);
-  const storeToken = userStore(store=>store.storeToken);
   const nav = useNavigate();
   const initialState = {
     email: "",

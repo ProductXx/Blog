@@ -34,6 +34,6 @@ export const useFollowUser = (queryClient) => {
 export const useGetUserDetail = (queryClient) => {
   return useMutation({
     mutationFn: getUserDetail,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Users"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Blogs"] }),
   });
 };

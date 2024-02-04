@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import { editUserRoute } from "../Global/API/userRoute";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -9,14 +9,14 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const EditUser = () => {
   const queryClient = useQueryClient();
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const nav = useNavigate();
   const { mutateAsync } = useGetUserDetail(queryClient);
 
   const initialState = {
-    _id: userInfo?._id,
-    name: userInfo?.name,
-    email: userInfo?.email,
+    _id: loginUser?._id,
+    name: loginUser?.name,
+    email: loginUser?.email,
   };
 
   const [formData, setFormData] = useState(initialState);

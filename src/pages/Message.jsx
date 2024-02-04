@@ -1,21 +1,21 @@
 import React from "react";
-import { userStore } from "../Global/API/store";
+import { userStore } from "../Global/Store/store";
 import Avatar from "../utils/Avatar";
 import { useGetAllUsers } from "../Hooks/user";
 import { TbMessageCircleBolt } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
 const Message = () => {
-  const userInfo = userStore((store) => store.userInfo);
+  const loginUser = userStore((store) => store.loginUser);
   const activeUser = userStore((store) => store.activeUsers);
   const { data: users } = useGetAllUsers();
-  // console.log(userInfo, users);
+  // console.log(loginUser, users);
 
   const nav = useNavigate();
 
   // for showing active
   // const isMatch = users?.data?.data.some((user) =>
-  //   activeUser?.some((acusr) => acusr?.userInfo?._id === user?._id)
+  //   activeUser?.some((acusr) => acusr?.loginUser?._id === user?._id)
   // );
 
   return (
@@ -24,10 +24,10 @@ const Message = () => {
       <div className="space-y-3">
         {users?.map((user) => {
           const isActive = activeUser?.some(
-            (acusr) => acusr?.userInfo?._id === user?._id
+            (acusr) => acusr?.loginUser?._id === user?._id
           );
           // for showing all users
-          return user._id === userInfo._id ? null : (
+          return user._id === loginUser._id ? null : (
             <div
               onClick={(e) => {
                 e.stopPropagation();
