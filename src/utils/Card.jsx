@@ -67,11 +67,13 @@ const Card = ({ blog }) => {
             </div>
           </div>
           {/* If userId and blog userId is same, can't follow yourself and not same it's ok */}
-          {loginUser?._id === ownerInfo._id ? (
-            <DeleteBtn blogId={_id} />
-          ) : (
-            <FollowBtn loginUser={loginUser} ownerInfo={ownerInfo} />
-          )}
+          {token ? (
+            loginUser?._id === ownerInfo._id ? (
+              <DeleteBtn blogId={_id} />
+            ) : (
+              <FollowBtn loginUser={loginUser} ownerInfo={ownerInfo} />
+            )
+          ) : null}
         </div>
         <div className="flex flex-col gap-2 p-2 mb-3">
           <h1 className="font-bold text-xl uppercase">{title}</h1>

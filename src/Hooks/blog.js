@@ -4,10 +4,10 @@ import {
   commentBlog,
   createBlog,
   deleteCmt,
+  editCmt,
   getOwnerBlog,
   likeBlogs,
 } from "../Global/API/blogRoute";
-
 
 // Mutation
 export const useCreateBlog = (queryClient) => {
@@ -29,6 +29,13 @@ export const useLikeBlog = (queryClient) => {
 export const useCommentBlog = (queryClient) => {
   return useMutation({
     mutationFn: commentBlog,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Blog"] }),
+  });
+};
+
+export const useEditCmt = (queryClient) => {
+  return useMutation({
+    mutationFn: editCmt,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Blog"] }),
   });
 };

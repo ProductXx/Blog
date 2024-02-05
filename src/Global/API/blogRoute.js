@@ -6,6 +6,7 @@ const createBlogRoute = `${import.meta.env.VITE_API}/blog/create`;
 const likeBlogRoute = `/blog/like`;
 const commentBlogRoute = `/blog/comment`;
 const deleteCmtRoute = `/blog/comment/delete`;
+const editCmtRoute = `/blog/comment/edit`;
 export const getOwnerBlogRoute = `/blog/owner-blogs`;
 
 const token = Cookies.get("token");
@@ -29,7 +30,9 @@ const likeBlogs = async (id) => {
 const commentBlog = async (body) => {
   return request({ url: commentBlogRoute, method: "post", data: body });
 };
-
+const editCmt = async (body) => {
+  return request({ url: editCmtRoute, method: "put", data: body });
+};
 // Delete
 const deleteCmt = async (id) => {
   return request({ url: deleteCmtRoute, method: "delete", data: id });
@@ -39,4 +42,4 @@ const getOwnerBlog = async (id) => {
   return request({ url: getOwnerBlogRoute, method: "post", data: id });
 };
 
-export { createBlog, likeBlogs, commentBlog, deleteCmt, getOwnerBlog };
+export { createBlog, likeBlogs, commentBlog, deleteCmt, getOwnerBlog,editCmt };

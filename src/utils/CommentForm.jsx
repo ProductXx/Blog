@@ -2,26 +2,54 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { IoIosSend } from "react-icons/io";
 import Avatar from "./Avatar";
-import { BiSolidTrashAlt } from "react-icons/bi";
+import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
 import { userStore } from "../Global/Store/store";
-import { useCommentBlog, useDeleteCmt } from "../Hooks/blog";
+import { useCommentBlog, useDeleteCmt, useEditCmt } from "../Hooks/blog";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetAllUsers } from "../Hooks/user";
 
 const CommentForm = ({ comments, blogId }) => {
   const [comment, setComment] = useState("");
+  const [edit, setEdit] = useState(false);
+  const [editCmt, setEditCmt] = useState({});
+  const [editingCommentId, setEditingCommentId] = useState(null);
   const loginUser = userStore((store) => store.loginUser);
   const queryClient = useQueryClient();
 
   const { data: users } = useGetAllUsers();
   const { mutateAsync } = useCommentBlog(queryClient);
+  const { mutateAsync: editComment } = useEditCmt(queryClient);
   const { mutateAsync: deleteCmt } = useDeleteCmt(queryClient);
+
+  // Update the edit button click handler to set the editing comment
+  const handleEditClick = (cmtId) => {
+    setEditingCommentId(cmtId);
+    setEdit(true);
+    // Find the comment object by its id and set it in the editCmt
+    const editedComment = comments.find((cmt) => cmt._id === cmtId);
+    setEditCmt(editedComment);
+  };
+
+  // Update the editComment button to cancel editing
+  const handleCancelEdit = () => {
+    setEdit(false);
+    setEditCmt({});
+    setEditingCommentId(null);
+  };
 
   // Post comment route need blogId and User Comment
   const postComment = async (e) => {
     e.preventDefault();
-    if (comment === "") {
-      toast.error("Comment is not be empty!");
+    if (Object.keys(editCmt).length !== 0) {
+      const { _id, userComment } = editCmt;
+      if (userComment === "") {
+        toast.error("Comment is not to be empty");
+        return;
+      }
+      editComment({ commentId: _id, userComment });
+      handleCancelEdit();
+    } else if (comment === "") {
+      toast.error("Comment is not to be empty");
       return;
     } else {
       mutateAsync({ blogId, userComment: comment });
@@ -31,7 +59,7 @@ const CommentForm = ({ comments, blogId }) => {
 
   // Show Commented User
   const cmtUserName = (cmt) => {
-    const user = users?.data?.data?.find((el) => el._id === cmt.userId);
+    const user = users?.find((el) => el._id === cmt.userId);
     return user;
   };
 
@@ -57,6 +85,14 @@ const CommentForm = ({ comments, blogId }) => {
                   </div>
                   {loginUser?._id === cmt?.userId ? (
                     <div className="flex gap-2">
+                      <BiSolidPencil
+                        onClick={() => handleEditClick(cmt._id)}
+                        className="text-xl border rounded-full w-9 h-9 p-2 text-primary"
+                      />
+
+                      {edit && cmt?._id === editingCommentId && (
+                        <button onClick={handleCancelEdit}>Cancel Edit</button>
+                      )}
                       <BiSolidTrashAlt
                         onClick={() => deleteCmt({ commentId: cmt?._id })}
                         className="text-xl border rounded-full w-9 h-9 p-2 text-red-600"
@@ -65,9 +101,13 @@ const CommentForm = ({ comments, blogId }) => {
                   ) : null}
                 </div>
 
-                <span className="bg-[#fff] p-3 relative rounded-md after:w-5 after:h-5 after:bg-[#fff] after:absolute after:-top-2 after:left-3 after:rotate-45 after:rounded-sm">
-                  {cmt.userComment}
-                </span>
+                <div className="bg-[#fff] p-3 relative rounded-md after:w-5 after:h-3 after:bg-[#fff] after:absolute after:-top-2 after:left-3 after:rotate-45 after:rounded-sm">
+                  {edit && editingCommentId === cmt._id ? (
+                    <span>{editCmt.userComment}</span>
+                  ) : (
+                    <span>{cmt.userComment}</span>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -81,9 +121,15 @@ const CommentForm = ({ comments, blogId }) => {
             <input
               type="text"
               placeholder="Write a comment..."
-              className="px-3 py-1 outline-none h-10 w-full"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              className={`px-3 py-1 outline-none h-10 w-full ${
+                edit ? "border-2 border-primary rounded-l" : ""
+              }`}
+              value={edit ? editCmt.userComment : comment}
+              onChange={(e) => {
+                edit
+                  ? setEditCmt({ ...editCmt, userComment: e.target.value })
+                  : setComment(e.target.value);
+              }}
             />
             <button type="submit" className="p-2 bg-primary text-secondary">
               <IoIosSend className="text-xl" />

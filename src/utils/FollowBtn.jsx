@@ -3,6 +3,8 @@ import { useFollowUser, useGetUserDetail } from "../Hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { userStore } from "../Global/Store/store";
 import { FaCheckCircle, FaPlusCircle } from "react-icons/fa";
+import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 const FollowBtn = ({ ownerInfo }) => {
   const queryClient = useQueryClient();
@@ -12,7 +14,7 @@ const FollowBtn = ({ ownerInfo }) => {
   const { mutateAsync: followUser, isPending } = useFollowUser(queryClient);
   const { mutateAsync: fetchLoginUserDetail } = useGetUserDetail(queryClient);
 
-  const isFollowing = loginUser?.following.some((id) => id === ownerInfo._id);
+  const isFollowing = loginUser?.following?.some((id) => id === ownerInfo._id);
 
   const handleClick = useCallback(() => {
     followUser({ userId: ownerInfo._id }).then(() => {

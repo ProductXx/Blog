@@ -99,11 +99,7 @@ const CreateBlog = () => {
 
     createBlog(data);
   };
-
-  if (isSuccess) {
-    return nav("/");
-  }
-
+  if (isSuccess) nav("/");
   return (
     <div>
       <h1>CreateBlog</h1>
@@ -190,7 +186,7 @@ const CreateBlog = () => {
         </div>
         <div className="flex flex-col gap-y-5 md:gap-0 md:flex-row justify-between items-center">
           {/* submit btn */}
-          <button className="px-5 py-2 self-start primaryBtn">
+          <button disabled={isPending} className="px-5 py-2 self-start primaryBtn">
             {isPending ? "Posting..." : "Create"}
           </button>
         </div>
