@@ -1,8 +1,8 @@
 import React from "react";
-import HashTag from "./HashTag";
-import LikeBtn from "./LikeBtn";
-import CommentBtn from "./CommentBtn";
-import Avatar from "./Avatar";
+import HashTag from "../utils/HashTag";
+import LikeBtn from "../utils/LikeBtn";
+import CommentBtn from "../utils/CommentBtn";
+import Avatar from "../utils/Avatar";
 import moment from "moment";
 import { userStore } from "../Global/Store/store";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import DeleteBtn from "./DeleteBtn";
+import DeleteBtn from "../utils/DeleteBtn";
 
 const ProfileCards = ({ blog, email, name }) => {
   const {

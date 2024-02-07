@@ -55,7 +55,6 @@ const EditUser = () => {
         <div>
           {/* header */}
           <h1 className="text-2xl font-bold uppercase">Edit 📝</h1>
-          <h3 className="font-light">Enter your information to register</h3>
         </div>
         {/* content input */}
         {/* Name */}

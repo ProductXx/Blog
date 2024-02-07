@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { useSocket } from "./Hooks/socket";
 import { userStore } from "./Global/Store/store";
+import Selector from "./components/Selector";
 
 const queryClient = new QueryClient();
 
@@ -37,9 +38,10 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div>
+      <div className="relative">
         <Navbar />
-        <div className="px-2 pb-5 pt-20">
+        {location.pathname === "/" && <Selector />}
+        <div className="px-2 pb-5 mt-5">
           <Path />
         </div>
 

@@ -8,7 +8,7 @@ import axios from "axios";
 import { BiSolidPencil, BiSolidTrashAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import ProfileCards from "../utils/ProfileCards";
+import ProfileCards from "../components/ProfileCards";
 import { useGetAllUsers } from "../Hooks/user";
 import { useGetOwnerBlog } from "../Hooks/blog";
 import FollowBtn from "../utils/FollowBtn";

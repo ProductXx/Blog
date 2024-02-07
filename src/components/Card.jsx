@@ -1,15 +1,15 @@
 import React from "react";
 import moment from "moment";
 import Cookies from "js-cookie";
-import FollowBtn from "./FollowBtn";
-import HashTag from "./HashTag";
-import Avatar from "./Avatar";
-import LikeBtn from "./LikeBtn";
-import CommentBtn from "./CommentBtn";
+import FollowBtn from "../utils/FollowBtn";
+import HashTag from "../utils/HashTag";
+import Avatar from "../utils/Avatar";
+import LikeBtn from "../utils/LikeBtn";
+import CommentBtn from "../utils/CommentBtn";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { userStore } from "../Global/Store/store";
-import DeleteBtn from "./DeleteBtn";
+import DeleteBtn from "../utils/DeleteBtn";
 
 const Card = ({ blog }) => {
   const {

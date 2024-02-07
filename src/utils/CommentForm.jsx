@@ -85,13 +85,13 @@ const CommentForm = ({ comments, blogId }) => {
                   </div>
                   {loginUser?._id === cmt?.userId ? (
                     <div className="flex gap-2">
-                      <BiSolidPencil
-                        onClick={() => handleEditClick(cmt._id)}
-                        className="text-xl border rounded-full w-9 h-9 p-2 text-primary"
-                      />
-
-                      {edit && cmt?._id === editingCommentId && (
+                      {edit && cmt?._id === editingCommentId ? (
                         <button onClick={handleCancelEdit}>Cancel Edit</button>
+                      ) : (
+                        <BiSolidPencil
+                          onClick={() => handleEditClick(cmt._id)}
+                          className="text-xl border rounded-full w-9 h-9 p-2 text-primary"
+                        />
                       )}
                       <BiSolidTrashAlt
                         onClick={() => deleteCmt({ commentId: cmt?._id })}
