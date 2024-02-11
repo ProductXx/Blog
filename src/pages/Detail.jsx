@@ -1,10 +1,11 @@
 import React from "react";
 import moment from "moment";
 import HashTag from "../utils/HashTag";
-import CommentForm from "../utils/CommentForm";
+import CommentForm from "../components/Comment";
 import axios from "axios";
 import { userStore } from "../Global/Store/store";
 import { useQuery } from "@tanstack/react-query";
+import Comment from "../components/Comment";
 
 const Detail = () => {
   const storeBlog = userStore((store) => store.blog);
@@ -19,7 +20,7 @@ const Detail = () => {
   });
 
   return (
-    <div>
+    <div className="flex flex-col">
       <div>
         <img src={blog?.blogImg} alt="" />
       </div>
@@ -29,9 +30,9 @@ const Detail = () => {
         <HashTag hashTags={blog?.hashTag} />
         <p className="text-lg">{blog?.content}</p>
       </div>
-
+      {/* <Comment /> */}
       <div className="relative">
-        <CommentForm comments={blog?.comments} blogId={blog?._id} />
+        <Comment comments={blog?.comments} blogId={blog?._id} />
       </div>
     </div>
   );

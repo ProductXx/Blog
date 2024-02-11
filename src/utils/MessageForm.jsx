@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import Avatar from "./Avatar";
+import { toast } from "react-toastify";
 
 const MessageForm = ({ sendMessage }) => {
   const [message, setMessage] = useState("");
@@ -18,7 +19,7 @@ const MessageForm = ({ sendMessage }) => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && message.trim()) {
+              if (e.key === "Enter" && message.trim()) {
                 e.preventDefault();
                 sendMessage(message.trim());
                 setMessage("");
@@ -33,7 +34,9 @@ const MessageForm = ({ sendMessage }) => {
               }
             }}
             disabled={!message.trim()}
-            className={`p-2 bg-primary text-secondary ${!message.trim() ? "opacity-50" : ""}`}
+            className={`p-2 bg-primary text-secondary ${
+              !message.trim() ? "opacity-50" : ""
+            }`}
             aria-label="Send message"
           >
             <IoIosSend className="text-xl" />

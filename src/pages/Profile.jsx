@@ -12,6 +12,16 @@ import ProfileCards from "../components/ProfileCards";
 import { useGetAllUsers } from "../Hooks/user";
 import { useGetOwnerBlog } from "../Hooks/blog";
 import FollowBtn from "../utils/FollowBtn";
+import AvatarStack from "../utils/AvatarStack";
+
+const ShowCountContainer = ({ data, title }) => {
+  return (
+    <div>
+      <h1 className="font-bold text-2xl">{data ? data?.length : 0}</h1>
+      <span className="font-semibold">{title}</span>
+    </div>
+  );
+};
 
 const Profile = () => {
   const addUser = userStore((store) => store.addUser);
@@ -22,20 +32,10 @@ const Profile = () => {
   const token = Cookies.get("token");
 
   const [profile, setProfile] = useState([]);
-  const { data } = useGetAllUsers();
+  const { data: allUsers } = useGetAllUsers();
   const { mutateAsync: profileData } = useGetOwnerBlog();
 
-  const showFollowers = (usersData) => {
-    return usersData?.filter((user) =>
-      profile?.followers?.find((el) => user._id === el)
-    );
-  };
-
-  const showFollowing = (usersData) => {
-    return usersData?.filter((user) =>
-      profile?.following?.find((el) => user._id === el)
-    );
-  };
+  const { blogs, followers, following } = profile;
 
   // Only owner can delete --> need user id
   const handleDelete = async (e) => {
@@ -98,47 +98,22 @@ const Profile = () => {
       {/* Followers and Blogs info */}
       <div className="grid grid-cols-3 border-b pb-3 w-full">
         {/* blog */}
-        <div>
-          <h1 className="font-bold text-2xl">{profile?.blogs?.length}</h1>
-          <span className="font-semibold">Blogs</span>
-        </div>
+        <ShowCountContainer title={"Blogs"} data={blogs} />
         {/* Follower */}
-        <div>
-          <h1 className="font-bold text-2xl">
-            {profile?.followers ? profile?.followers?.length : 0}
-          </h1>
-          <span className="font-semibold">Followers</span>
-        </div>
+        <ShowCountContainer title={"Followers"} data={followers} />
         {/* Following */}
-        <div>
-          <h1 className="font-bold text-2xl">
-            {profile?.following ? profile?.following?.length : 0}
-          </h1>
-          <span className="font-semibold">Following</span>
-        </div>
+        <ShowCountContainer title={"Following"} data={following} />
       </div>
       {/* Show Followers Avatar */}
       <div className="w-full grid grid-cols-2">
         <div className="space-y-2 ">
           <h1 className="text-2xl font-semibold">Followers</h1>
-          <div className="flex gap-3 w-40 overflow-hidden">
-            {showFollowers(data)?.map((follower) => (
-              <div key={follower?._id} className="flex flex-col gap-1">
-                <Avatar name={follower?.email} stack={true} />
-              </div>
-            ))}
-          </div>
+          <AvatarStack usersData={allUsers} followers={followers} />
         </div>
         {/* Show Following Avatar */}
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold">Following</h1>
-          <div className="flex gap-3 w-40 overflow-hidden">
-            {showFollowing(data)?.map((following) => (
-              <div key={following?._id} className="flex flex-col gap-1">
-                <Avatar name={following?.email} stack={true} />
-              </div>
-            ))}
-          </div>
+          <AvatarStack usersData={allUsers} following={following} />
         </div>
       </div>
       {/* Blogs */}

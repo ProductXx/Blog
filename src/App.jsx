@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import Path from "./routes/Path";
 import Navbar from "./components/Navbar";
 import BottomNavbar from "./components/BottomNavbar";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { useSocket } from "./Hooks/socket";
 import { userStore } from "./Global/Store/store";
 import Selector from "./components/Selector";
+import axios from "axios";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => {
   const socket = useSocket("http://localhost:8000");
   const loginUser = userStore((store) => store.loginUser);
   const addActiveUsers = userStore((store) => store.addActiveUsers);
+  const addNoti = userStore((store) => store.addNoti);
 
   useEffect(() => {
     if (loginUser && socket) {
@@ -28,6 +30,10 @@ const App = () => {
 
       socket.on("showActiveUser", (data) => {
         addActiveUsers(data);
+      });
+
+      socket.on("receiveMessage", (receivedMessage) => {
+        addNoti({ content: receivedMessage, type: "received" });
       });
 
       socket.on("disconnect", () => {
@@ -45,7 +51,8 @@ const App = () => {
           <Path />
         </div>
 
-        {!location.pathname.includes("/message") && <BottomNavbar />}
+        {!location.pathname.includes("/message") &&
+          !location.pathname.includes("/detail") && <BottomNavbar />}
 
         <ToastContainer />
       </div>

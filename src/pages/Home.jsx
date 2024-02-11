@@ -14,15 +14,15 @@ const Home = () => {
     queryFn: () => axios.get(`${import.meta.env.VITE_API}/blog`),
   });
 
-  const followingBlogs = () => {
-    return blogs?.data?.data?.filter((blog) =>
-      loginUsers?.following?.find((el) => el === blog?.ownerInfo?._id)
-    );
-  };
-
-  const allBlogs = () => {
+  const sortedBlogs = () => {
     return blogs?.data?.data?.sort(
       (a, b) => new Date(b.date) - new Date(a.date)
+    );
+  }
+
+  const followingBlogs = () => {
+    return sortedBlogs().filter((blog) =>
+      loginUsers?.following?.find((el) => el === blog?.ownerInfo?._id)
     );
   };
 
@@ -31,7 +31,7 @@ const Home = () => {
     if (selected === "Following") {
       return followingBlogs();
     } else {
-      return allBlogs();
+      return sortedBlogs();
     }
   }, [blogs, selected]);
 

@@ -6,11 +6,13 @@ import MessageForm from "../utils/MessageForm";
 import { useSocket } from "../Hooks/socket";
 import { userStore } from "../Global/Store/store";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const DirectMessage = () => {
   const { id } = useParams();
   const { mutateAsync: profileData } = useGetOwnerBlog();
   const loginUser = userStore((store) => store.loginUser);
+  const removeNoti = userStore((store) => store.removeNoti);
   const socket = useSocket("http://localhost:8000");
 
   const [messages, setMessages] = useState([]);
@@ -28,7 +30,7 @@ const DirectMessage = () => {
         }
       );
       setMsgHistory(response?.data?.messages);
-      // console.log(response);
+      // console.log(response?.data?.messages);
     } catch (error) {
       console.log(error);
     }
@@ -79,6 +81,8 @@ const DirectMessage = () => {
         socket.off("messageSent");
       };
     }
+
+    removeNoti();
   }, [socket]);
 
   const sendMessage = (message) => {
